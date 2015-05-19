@@ -1,0 +1,26 @@
+ AutotunerPID - Interactive Simulation of a PID with autotuning
+ ==============================================================
+
+ 0/ Requirements:
+     - Matlab 6.5 or above
+	  - Operating system: any (Window and Linux tested).
+
+ 1/ Download the latest autotunerPID.zip on William Spinelli's website:
+       <http://www.elet.polimi.it/upload/wspinell/Tools/AutotunerPID/index.html>.
+ 
+ 2/ Extract files in your Matlab Repository /home/foo/matlab/ :
+       unzip autotunerPID.zip
+
+ 3/ Add the autotunerPID directory in your Matlab path:
+       addpath /home/foo/matlab/autotunerPID/
+   
+ 4/ Open autotunerPID.mdl
+ 
+ 5/ Ready to use !
+   
+ 6/ A documentation in html format is available in the help directory (index_doc.html)
+   
+ -------------------------------------------------------------------------------
+ Matlab is a Registered Trademark of The Mathworks, Inc.
+
+ Copyright (C) 2004 William Spinelli <wspinell@elet.polimi.it>

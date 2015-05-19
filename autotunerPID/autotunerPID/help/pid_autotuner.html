@@ -1,0 +1,239 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of pid_autotuner</title>
+  <meta name="keywords" content="pid_autotuner">
+  <meta name="description" content="PID_SUPERV Supervisor of a PID autotuner (implmented as an S-function)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="m2html.css">
+</head>
+<body>
+
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline bgcolor="#ffe4b0"><b>AutotunerPID Toolkit</b></td>
+<td valign=baseline bgcolor="#ffe4b0" align=right><a href="idareas.html"><img src="b_prev.gif" alt="Previous page" border=0></a>&nbsp;&nbsp;&nbsp;<a href="pid_isatd.html"><img src="b_next.gif" alt="Next Page" border=0></a></td>
+</tr>
+</table>
+
+<h1>pid_autotuner</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="box"><strong>Supervisor of a PID autotuner (implmented as a Matlab S-function).</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="box"><strong>function [sys,x0,str,ts] = pid_autotuner(t,x,u,flag,Ts,As) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="fragment"><pre class="comment">PID_SUPERV Supervisor of a PID autotuner (implmented as an S-function)
+
+   The supervisor, rules out the autotuning process mainly performing the
+   identification of a process model and the synthesis of the new
+   parameters with various methods. 
+   Moreover it is possible to constrain the structure of the regulator to
+   be a PI or a PID, or the structure can be automatically selected by the
+   supervisor.
+   In particular, the autotuner has the following feature:
+      - identification of process description:
+         * a FOPDT model through the areas method
+         * one point of the frequency response through the method of the
+           relay 
+      - sythesis of the PID parameters using
+         * KT method
+         * IMC method
+         * First and second ZN method
+      - it's still a work in progress!! ;-)
+
+   Author:    William Spinelli (wspinell@elet.polimi.it)
+   Copyright  2004 W.Spinelli
+   $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(matlabicon.gif)">
+<li><a href="idareas.html" class="code" title="function model = idareas(y,As,Ts)">idareas</a>	IDAREAS Identification of a FOPDT model using the method of the</li><li><a href="pid_structure.html" class="code" title="function regStruct = pid_structure(model,reqStruct)">pid_structure</a>	PID_STRUCTURE Structure selection for a ISA PID regulator.</li><li><a href="pid_tuning.html" class="code" title="function [K,Ti,Td,N,b] = pid_tuning(model,method,param,regStruct,As)">pid_tuning</a>	PID_TUNING Tune the parameters of a ISA-PID regulator with some</li></ul>
+This function is called by:
+<ul style="list-style-image:url(matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<ul style="list-style-image:url(matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [sys,x0,str,ts] = mdlInitializeSizes(Ts)</a></li><li><a href="#_sub2" class="code">function [sys] = mdlOutputs(t,x,u,Ts,As)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [sys,x0,str,ts] = pid_autotuner(t,x,u,flag,Ts,As)</a>
+0002 <span class="comment">%PID_SUPERV Supervisor of a PID autotuner (implmented as an S-function)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%   The supervisor, rules out the autotuning process mainly performing the</span>
+0005 <span class="comment">%   identification of a process model and the synthesis of the new</span>
+0006 <span class="comment">%   parameters with various methods.</span>
+0007 <span class="comment">%   Moreover it is possible to constrain the structure of the regulator to</span>
+0008 <span class="comment">%   be a PI or a PID, or the structure can be automatically selected by the</span>
+0009 <span class="comment">%   supervisor.</span>
+0010 <span class="comment">%   In particular, the autotuner has the following feature:</span>
+0011 <span class="comment">%      - identification of process description:</span>
+0012 <span class="comment">%         * a FOPDT model through the areas method</span>
+0013 <span class="comment">%         * one point of the frequency response through the method of the</span>
+0014 <span class="comment">%           relay</span>
+0015 <span class="comment">%      - sythesis of the PID parameters using</span>
+0016 <span class="comment">%         * KT method</span>
+0017 <span class="comment">%         * IMC method</span>
+0018 <span class="comment">%         * First and second ZN method</span>
+0019 <span class="comment">%      - it's still a work in progress!! ;-)</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">%   Author:    William Spinelli (wspinell@elet.polimi.it)</span>
+0022 <span class="comment">%   Copyright  2004 W.Spinelli</span>
+0023 <span class="comment">%   $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $</span>
+0024 
+0025 <span class="keyword">switch</span> flag,
+0026    <span class="comment">% Initialization</span>
+0027    <span class="keyword">case</span> 0,
+0028       [sys,x0,str,ts] = <a href="#_sub1" class="code" title="subfunction [sys,x0,str,ts] = mdlInitializeSizes(Ts)">mdlInitializeSizes</a>(Ts);
+0029       <span class="comment">% Outputs</span>
+0030    <span class="keyword">case</span> 3,
+0031       [sys] = <a href="#_sub2" class="code" title="subfunction [sys] = mdlOutputs(t,x,u,Ts,As)">mdlOutputs</a>(t,x,u,Ts,As);
+0032       <span class="comment">% Unused flags</span>
+0033    <span class="keyword">case</span> { 1, 2, 4, 9 }
+0034       sys = [];
+0035    <span class="keyword">otherwise</span>
+0036       error([<span class="string">'Unhandled flag = '</span>,num2str(flag)]);        
+0037 <span class="keyword">end</span>
+0038 <span class="comment">% end pid_superv</span>
+0039 
+0040 
+0041 <span class="comment">%=============================================================================</span>
+0042 <span class="comment">% mdlInitializeSizes</span>
+0043 <span class="comment">% Return the sizes, initial conditions, and sample times for the S-function.</span>
+0044 <span class="comment">%=============================================================================</span>
+0045 <a name="_sub1" href="#_subfunctions" class="code">function [sys,x0,str,ts] = mdlInitializeSizes(Ts)</a>
+0046 <span class="keyword">global</span> Y_AUTOTUNING     <span class="comment">% store the step (or relay) response used for tuning</span>
+0047 
+0048 Y_AUTOTUNING = [];      <span class="comment">% initialized to an empty vector</span>
+0049 
+0050 <span class="comment">% set up S-function</span>
+0051 sizes = simsizes;
+0052 
+0053 sizes.NumContStates  = 0;
+0054 sizes.NumDiscStates  = 0;
+0055 sizes.NumOutputs     = 2;
+0056 sizes.NumInputs      = 1;
+0057 sizes.DirFeedthrough = 1;
+0058 sizes.NumSampleTimes = 1;   <span class="comment">% at least one sample time is needed</span>
+0059 
+0060 sys = simsizes(sizes);
+0061 
+0062 x0  = [];
+0063 str = [];
+0064 ts  = [Ts 0];
+0065 <span class="comment">% end mdlInitializeSizes</span>
+0066 
+0067 
+0068 <span class="comment">%=============================================================================</span>
+0069 <span class="comment">% mdlOutputs</span>
+0070 <span class="comment">% Return the block outputs.</span>
+0071 <span class="comment">%=============================================================================</span>
+0072 <a name="_sub2" href="#_subfunctions" class="code">function [sys] = mdlOutputs(t,x,u,Ts,As)</a>
+0073 <span class="comment">% sys(1)    :    auto/manual switch</span>
+0074 <span class="comment">% sys(2)    :    autotuning (0 : autotuning in progress; 1 : normal operation)</span>
+0075 
+0076 <span class="comment">% u(1)      :    new sample of the step response</span>
+0077 
+0078 <span class="keyword">global</span> PIDPARAMETERS
+0079 <span class="keyword">global</span> IDENTIFICATION_METHOD
+0080 <span class="keyword">global</span> TUNING_STRUCTURE
+0081 <span class="keyword">global</span> TUNING_METHOD
+0082 <span class="keyword">global</span> TUNING_PARAM
+0083 <span class="keyword">global</span> AUTOTUNE
+0084 <span class="keyword">global</span> AUTOMAN
+0085 
+0086 <span class="keyword">global</span> Y_AUTOTUNING
+0087 
+0088 step_steadyThr  = 0.05;    <span class="comment">% threshold on derivative to consider the</span>
+0089                            <span class="comment">% step response to a stedy state</span>
+0090 relay_steadyThr = 0.05;    <span class="comment">% threshold on peaks percentual difference to</span>
+0091                            <span class="comment">% consider the relay response to steady state</span>
+0092 
+0093 <span class="keyword">if</span> AUTOTUNE
+0094    <span class="comment">% store the new sample of the step response</span>
+0095    Y_AUTOTUNING = [Y_AUTOTUNING; u(1)];
+0096    y = Y_AUTOTUNING;
+0097    
+0098    <span class="keyword">if</span> strcmp(IDENTIFICATION_METHOD,<span class="string">'STEP'</span>)
+0099       <span class="comment">% check if the step response has reached a steady state (i. e. check if</span>
+0100       <span class="comment">% the last 10% of the step response is ``flat'' enough)</span>
+0101       N  = fix(length(y)/10);   <span class="comment">% last 10% of the step response</span>
+0102       <span class="keyword">if</span> N &gt; 15
+0103          <span class="comment">% the step response must be made at least by 150 samples</span>
+0104          deltay = abs(y(end)-y(1));
+0105          yw = y(end-N:end);
+0106          <span class="comment">% mean value of the derivative in the window lower than a fraction</span>
+0107          <span class="comment">% of the maximum value of the derivative</span>
+0108          idok = (max(yw)-min(yw)) &lt; step_steadyThr*(max(y)-min(y));
+0109       <span class="keyword">else</span>
+0110          idok = 0;
+0111       <span class="keyword">end</span>
+0112       <span class="keyword">if</span> idok
+0113          model = <a href="idareas.html" class="code" title="function model = idareas(y,As,Ts)">idareas</a>(y,1,Ts);
+0114       <span class="keyword">end</span>
+0115    <span class="keyword">elseif</span> strcmp(IDENTIFICATION_METHOD,<span class="string">'RELAY'</span>)
+0116       <span class="comment">% IDENTIFICATION WITH THE RELAY METHOD</span>
+0117       dy = diff(y);
+0118       ind = find(dy(1:end-1)&gt;0 &amp; dy(2:end)&lt;0);
+0119       
+0120       <span class="comment">% at least 4 oscillations but no more than 10 oscillations</span>
+0121       <span class="keyword">if</span> length(ind)&gt;=4 &amp; length(ind)&lt;10
+0122          ym = mean(y);
+0123          <span class="comment">% mean value of the difference between the last three peaks is</span>
+0124          <span class="comment">% less than a fraction of the overall range of the response</span>
+0125          idok = mean(abs(diff(y(ind(end-2:end))))) &lt; relay_steadyThr*(max(y)-min(y));
+0126          <span class="comment">% the last ``period'' must cross the zero</span>
+0127          idok = idok &amp; any(abs(y(ind(end-1):ind(end))-ym) &lt; relay_steadyThr/2*abs(max(y)-ym));
+0128       <span class="keyword">elseif</span> length(ind)&gt;=10
+0129          <span class="comment">% force the stop of the relay identification</span>
+0130          idok = 1;
+0131       <span class="keyword">else</span>
+0132          idok = 0;
+0133       <span class="keyword">end</span>
+0134       
+0135       <span class="keyword">if</span> idok
+0136          model.A = max(y)-min(y);
+0137          model.T = Ts*(ind(end)-ind(end-1));
+0138       <span class="keyword">end</span>    
+0139    <span class="keyword">end</span>
+0140    
+0141    <span class="comment">% autotuning required</span>
+0142    <span class="keyword">if</span> idok        
+0143       <span class="comment">% selection of the regulator structure</span>
+0144       regStruct = <a href="pid_structure.html" class="code" title="function regStruct = pid_structure(model,reqStruct)">pid_structure</a>(model,TUNING_STRUCTURE);
+0145       
+0146       <span class="comment">% synthesis of the PID parameters</span>
+0147       <span class="keyword">try</span>
+0148          [K,Ti,Td,N,b] = <a href="pid_tuning.html" class="code" title="function [K,Ti,Td,N,b] = pid_tuning(model,method,param,regStruct,As)">pid_tuning</a>(model,TUNING_METHOD,TUNING_PARAM,regStruct,As);
+0149          <span class="comment">% update PID parameters</span>
+0150          PIDPARAMETERS = [K Ti Td N b];
+0151       <span class="keyword">catch</span>
+0152          <span class="comment">% no change in the parameters</span>
+0153       <span class="keyword">end</span>
+0154       
+0155       AUTOTUNE = 0;
+0156    <span class="keyword">end</span>
+0157    <span class="comment">% put the PID in manual mode during autotuning and propagate the</span>
+0158    <span class="comment">% ``autotuning running'' signal</span>
+0159    sys = [AUTOMAN 1];   
+0160 <span class="keyword">else</span>
+0161    <span class="comment">% empty the step response vector</span>
+0162    Y_AUTOTUNING = [];
+0163    <span class="comment">% put the PID in auto mode during autotuning and propagate the</span>
+0164    <span class="comment">% ``autotuning not running'' signal</span>
+0165    sys = [AUTOMAN 0];
+0166 <span class="keyword">end</span>
+0167 <span class="comment">% end mdlOutputs</span></pre></div>
+<br>
+<p><table bgcolor="#ffe4b0" border=0 width="100%" cellpadding=0 cellspacing=0><tr valign=top><td align=left width=20><a href="idareas.html"><img src="b_prev.gif" alt="Previous page" border=0 align=bottom></a>&nbsp;</td><td align=left>&nbsp;idareas</td><td>&nbsp;</td><td align=right>pid_isatd&nbsp;</td><td align=right width=20><a href="pid_isatd.html"><img src="b_next.gif" alt="Next page" border=0 align=bottom></a></td></tr></table>
+<br>
+<address>Generated on Wed 17-Mar-2004 09:29:44 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,557 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of envgui</title>
+  <meta name="keywords" content="envgui">
+  <meta name="description" content="ENVGUI S-function for making a simple PID GUI">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="m2html.css">
+</head>
+<body>
+
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline bgcolor="#ffe4b0"><b>AutotunerPID Toolkit</b></td>
+<td valign=baseline bgcolor="#ffe4b0" align=right><a href="butterdesign.html"><img src="b_prev.gif" alt="Previous page" border=0></a>&nbsp;&nbsp;&nbsp;<a href="idareas.html"><img src="b_next.gif" alt="Next Page" border=0></a></td>
+</tr>
+</table>
+
+<h1>envgui</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="box"><strong>Matlab S-function for making a simple PID GUI.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="box"><strong>function [sys,x0,str,ts] = envgui(t,x,u,flag,NoiseBlock,LoadDistBlock) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="fragment"><pre class="comment">ENVGUI S-function for making a simple PID GUI
+
+   When the model autotunerPID.mdl is run, this S-function create a panel
+   designed as a console from which controlling the simulation
+   environment.  For example a measurement noise or a step on the load
+   disturbance can be included. 
+   The most interesting part of this interface is the one termed
+   ``Comparative Analysis'' which include analysis tools for both time and
+   frequency domain.  
+   The time domain analysis perform a comparison of the responses to a
+   step on the set-point and on the load disturbance for a PID tuned with
+   all the available methods.
+   The frequency domain analysis reports the open loop Bode diagram of the
+   control system together with the Bode diagram of the complementary
+   sensitivity and the sensitivity function. 
+
+   Everything started looking at PENDAN, an S-function for making pendulum
+   animation
+
+   Author:    William Spinelli (wspinell@elet.polimi.it)
+   Copyright  2004 W.Spinelli
+   $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(matlabicon.gif)">
+<li><a href="bodePIDcompare.html" class="code" title="function bodePIDcompare(num,den,tau)">bodePIDcompare</a>	BODEPIDCOMPARE  Comparison of Bode Diagrams with different autotuning</li><li><a href="stepPIDcompare.html" class="code" title="function stepPIDcompare(num,den,tau)">stepPIDcompare</a>	STEPPIDCOMPARE  Comparison of step response on setpoint and load</li></ul>
+This function is called by:
+<ul style="list-style-image:url(matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<ul style="list-style-image:url(matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [sys,x0,str,ts] = mdlInitializeSizes(NoiseBlock,LoadDistBlock)</a></li><li><a href="#_sub2" class="code">function sys = mdlUpdate(t,x,u)</a></li><li><a href="#_sub3" class="code">function LocalDeleteBlock</a></li><li><a href="#_sub4" class="code">function LocalClose</a></li><li><a href="#_sub5" class="code">function LocalDeleteFigure</a></li><li><a href="#_sub6" class="code">function LocalNoise</a></li><li><a href="#_sub7" class="code">function LocalNoiseParam</a></li><li><a href="#_sub8" class="code">function LocalDist</a></li><li><a href="#_sub9" class="code">function LocalDistParam</a></li><li><a href="#_sub10" class="code">function LocalStepPID</a></li><li><a href="#_sub11" class="code">function LocalBodePID</a></li><li><a href="#_sub12" class="code">function LocalHlp</a></li><li><a href="#_sub13" class="code">function LocalEnvSets(time,ud,u)</a></li><li><a href="#_sub14" class="code">function LocalEnvInit(NoiseBlock,LoadDistBlock)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [sys,x0,str,ts] = envgui(t,x,u,flag,NoiseBlock,LoadDistBlock)</a>
+0002 <span class="comment">%ENVGUI S-function for making a simple PID GUI</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%   When the model autotunerPID.mdl is run, this S-function create a panel</span>
+0005 <span class="comment">%   designed as a console from which controlling the simulation</span>
+0006 <span class="comment">%   environment.  For example a measurement noise or a step on the load</span>
+0007 <span class="comment">%   disturbance can be included.</span>
+0008 <span class="comment">%   The most interesting part of this interface is the one termed</span>
+0009 <span class="comment">%   ``Comparative Analysis'' which include analysis tools for both time and</span>
+0010 <span class="comment">%   frequency domain.</span>
+0011 <span class="comment">%   The time domain analysis perform a comparison of the responses to a</span>
+0012 <span class="comment">%   step on the set-point and on the load disturbance for a PID tuned with</span>
+0013 <span class="comment">%   all the available methods.</span>
+0014 <span class="comment">%   The frequency domain analysis reports the open loop Bode diagram of the</span>
+0015 <span class="comment">%   control system together with the Bode diagram of the complementary</span>
+0016 <span class="comment">%   sensitivity and the sensitivity function.</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%   Everything started looking at PENDAN, an S-function for making pendulum</span>
+0019 <span class="comment">%   animation</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">%   Author:    William Spinelli (wspinell@elet.polimi.it)</span>
+0022 <span class="comment">%   Copyright  2004 W.Spinelli</span>
+0023 <span class="comment">%   $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $</span>
+0024 
+0025 <span class="comment">% Plots every major integration step, but has no states of its own</span>
+0026 <span class="keyword">switch</span> flag,
+0027    
+0028    <span class="comment">% Initialization</span>
+0029    <span class="keyword">case</span> 0,
+0030       [sys,x0,str,ts] = <a href="#_sub1" class="code" title="subfunction [sys,x0,str,ts] = mdlInitializeSizes(NoiseBlock,LoadDistBlock)">mdlInitializeSizes</a>(NoiseBlock,LoadDistBlock);
+0031       <span class="comment">% Update</span>
+0032    <span class="keyword">case</span> 2,
+0033       sys = <a href="#_sub2" class="code" title="subfunction sys = mdlUpdate(t,x,u)">mdlUpdate</a>(t,x,u);
+0034       <span class="comment">% Unused flags</span>
+0035    <span class="keyword">case</span> { 1, 3, 4, 9 },
+0036       sys = [];
+0037       <span class="comment">% DeleteBlock</span>
+0038    <span class="keyword">case</span> <span class="string">'DeleteBlock'</span>,
+0039       <a href="#_sub3" class="code" title="subfunction LocalDeleteBlock">LocalDeleteBlock</a>
+0040       <span class="comment">% DeleteFigure</span>
+0041    <span class="keyword">case</span> <span class="string">'DeleteFigure'</span>,
+0042       <a href="#_sub5" class="code" title="subfunction LocalDeleteFigure">LocalDeleteFigure</a>
+0043       <span class="comment">% Close</span>
+0044    <span class="keyword">case</span> <span class="string">'Close'</span>,
+0045       <a href="#_sub4" class="code" title="subfunction LocalClose">LocalClose</a>
+0046       <span class="comment">% Noise</span>
+0047    <span class="keyword">case</span> <span class="string">'Noise'</span>,
+0048       <a href="#_sub6" class="code" title="subfunction LocalNoise">LocalNoise</a>
+0049       <span class="comment">% NoiseParam</span>
+0050    <span class="keyword">case</span> <span class="string">'NoiseParam'</span>,
+0051       <a href="#_sub7" class="code" title="subfunction LocalNoiseParam">LocalNoiseParam</a>
+0052       <span class="comment">% Dist</span>
+0053    <span class="keyword">case</span> <span class="string">'Dist'</span>,
+0054       <a href="#_sub8" class="code" title="subfunction LocalDist">LocalDist</a>
+0055       <span class="comment">% DistParam</span>
+0056    <span class="keyword">case</span> <span class="string">'DistParam'</span>,
+0057       <a href="#_sub9" class="code" title="subfunction LocalDistParam">LocalDistParam</a>
+0058       <span class="comment">% StepPID</span>
+0059    <span class="keyword">case</span> <span class="string">'StepPID'</span>,
+0060       <a href="#_sub10" class="code" title="subfunction LocalStepPID">LocalStepPID</a>
+0061       <span class="comment">% BodePID</span>
+0062    <span class="keyword">case</span> <span class="string">'BodePID'</span>,
+0063       <a href="#_sub11" class="code" title="subfunction LocalBodePID">LocalBodePID</a>
+0064       <span class="comment">% Help</span>
+0065    <span class="keyword">case</span> <span class="string">'Hlp'</span>,
+0066       <a href="#_sub12" class="code" title="subfunction LocalHlp">LocalHlp</a>
+0067       <span class="comment">% Unexpected flags</span>
+0068    <span class="keyword">otherwise</span>
+0069       error([<span class="string">'Unhandled flag = '</span>,num2str(flag)]);
+0070 <span class="keyword">end</span>
+0071 <span class="comment">% end envgui</span>
+0072 
+0073 <span class="comment">%=============================================================================</span>
+0074 <span class="comment">% mdlInitializeSizes</span>
+0075 <span class="comment">% Return the sizes, initial conditions, and sample times for the S-function.</span>
+0076 <span class="comment">%=============================================================================</span>
+0077 <a name="_sub1" href="#_subfunctions" class="code">function [sys,x0,str,ts] = mdlInitializeSizes(NoiseBlock,LoadDistBlock)</a>
+0078 <span class="comment">% initialize parameters (setpoint)</span>
+0079 set_param(get_param([get_param(gcs,<span class="string">'Parent'</span>) <span class="string">'/'</span> NoiseBlock],<span class="string">'Handle'</span>),<span class="keyword">...</span>
+0080    <span class="string">'Variance'</span>,<span class="string">'0'</span>);
+0081 set_param(get_param([get_param(gcs,<span class="string">'Parent'</span>) <span class="string">'/'</span> LoadDistBlock],<span class="string">'Handle'</span>),<span class="keyword">...</span>
+0082    <span class="string">'Value'</span>,<span class="string">'0'</span>);
+0083 
+0084 <span class="comment">% set up S-function</span>
+0085 sizes = simsizes;
+0086 
+0087 sizes.NumContStates  = 0;
+0088 sizes.NumDiscStates  = 0;
+0089 sizes.NumOutputs     = 0;
+0090 sizes.NumInputs      = 0;
+0091 sizes.DirFeedthrough = 0;
+0092 sizes.NumSampleTimes = 1;
+0093 
+0094 sys = simsizes(sizes);
+0095 
+0096 x0  = [];
+0097 str = [];
+0098 ts  = [0.1 0];
+0099 
+0100 <a href="#_sub14" class="code" title="subfunction LocalEnvInit(NoiseBlock,LoadDistBlock)">LocalEnvInit</a>(NoiseBlock,LoadDistBlock);
+0101 <span class="comment">% end mdlInitializeSizes</span>
+0102 
+0103 
+0104 <span class="comment">%=============================================================================</span>
+0105 <span class="comment">% mdlUpdate</span>
+0106 <span class="comment">% Update the Environment Control GUI animation.</span>
+0107 <span class="comment">%=============================================================================</span>
+0108 <a name="_sub2" href="#_subfunctions" class="code">function sys = mdlUpdate(t,x,u)</a>
+0109 fig = get_param(gcbh,<span class="string">'UserData'</span>);
+0110 <span class="keyword">if</span> ishandle(fig),
+0111    <span class="keyword">if</span> strcmp(get(fig,<span class="string">'Visible'</span>),<span class="string">'on'</span>),
+0112       ud = get(fig,<span class="string">'UserData'</span>);
+0113       <a href="#_sub13" class="code" title="subfunction LocalEnvSets(time,ud,u)">LocalEnvSets</a>(t,ud,u);
+0114    <span class="keyword">end</span>
+0115 <span class="keyword">end</span>
+0116 sys = [];
+0117 <span class="comment">% end mdlUpdate</span>
+0118 
+0119 
+0120 <span class="comment">%=============================================================================</span>
+0121 <span class="comment">% LocalDeleteBlock</span>
+0122 <span class="comment">% The animation block is being deleted, delete the associated figure.</span>
+0123 <span class="comment">%=============================================================================</span>
+0124 <a name="_sub3" href="#_subfunctions" class="code">function LocalDeleteBlock</a>
+0125 fig = get_param(gcbh,<span class="string">'UserData'</span>);
+0126 <span class="keyword">if</span> ishandle(fig),
+0127    delete(fig);
+0128    set_param(gcbh,<span class="string">'UserData'</span>,-1)
+0129 <span class="keyword">end</span>
+0130 <span class="comment">% end LocalDeleteBlock</span>
+0131 
+0132 
+0133 <span class="comment">%=============================================================================</span>
+0134 <span class="comment">% LocalClose</span>
+0135 <span class="comment">% The callback function for the animation window close button.  Delete</span>
+0136 <span class="comment">% the animation figure window.</span>
+0137 <span class="comment">%=============================================================================</span>
+0138 <a name="_sub4" href="#_subfunctions" class="code">function LocalClose</a>
+0139 delete(gcbf)
+0140 <span class="comment">% end LocalClose</span>
+0141 
+0142 
+0143 <span class="comment">%=============================================================================</span>
+0144 <span class="comment">% LocalDeleteFigure</span>
+0145 <span class="comment">% The animation figure is being deleted, set the S-function UserData to -1.</span>
+0146 <span class="comment">%=============================================================================</span>
+0147 <a name="_sub5" href="#_subfunctions" class="code">function LocalDeleteFigure</a>
+0148 ud = get(gcbf,<span class="string">'UserData'</span>);
+0149 set_param(ud.Block,<span class="string">'UserData'</span>,-1);
+0150 <span class="comment">% end LocalDeleteFigure</span>
+0151 
+0152 
+0153 <span class="comment">%=============================================================================</span>
+0154 <span class="comment">% LocalNoise</span>
+0155 <span class="comment">% The callback function for the activation/deactivation of the measurement</span>
+0156 <span class="comment">% noise</span>
+0157 <span class="comment">%=============================================================================</span>
+0158 <a name="_sub6" href="#_subfunctions" class="code">function LocalNoise</a>
+0159 ud = get(gcbf,<span class="string">'UserData'</span>);
+0160 <span class="keyword">if</span> get(ud.Noise,<span class="string">'Value'</span>)
+0161    set_param(ud.NoiseBlock,<span class="string">'Variance'</span>,get(ud.NoiseVar,<span class="string">'String'</span>));
+0162 <span class="keyword">else</span>
+0163    set_param(ud.NoiseBlock,<span class="string">'Variance'</span>,num2str(0));
+0164 <span class="keyword">end</span>
+0165 <span class="comment">% end LocalNoise</span>
+0166 
+0167 
+0168 <span class="comment">%=============================================================================</span>
+0169 <span class="comment">% LocalNoiseParam</span>
+0170 <span class="comment">% The callback function for setting of noise variance</span>
+0171 <span class="comment">%=============================================================================</span>
+0172 <a name="_sub7" href="#_subfunctions" class="code">function LocalNoiseParam</a>
+0173 ud = get(gcbf,<span class="string">'UserData'</span>);
+0174 <span class="keyword">if</span> get(ud.Noise,<span class="string">'Value'</span>)
+0175    set_param(ud.NoiseBlock,<span class="string">'Variance'</span>,get(ud.NoiseVar,<span class="string">'String'</span>));
+0176 <span class="keyword">end</span>
+0177 <span class="comment">% end LocalNoiseParam</span>
+0178 
+0179 
+0180 <span class="comment">%=============================================================================</span>
+0181 <span class="comment">% LocalDist</span>
+0182 <span class="comment">% The callback function for the activation/deactivation of load disturbance</span>
+0183 <span class="comment">%=============================================================================</span>
+0184 <a name="_sub8" href="#_subfunctions" class="code">function LocalDist</a>
+0185 ud = get(gcbf,<span class="string">'UserData'</span>);
+0186 <span class="keyword">if</span> get(ud.LoadDist,<span class="string">'Value'</span>)
+0187    set_param(ud.LoadDistBlock,<span class="string">'Value'</span>,get(ud.LoadAmp,<span class="string">'String'</span>));
+0188 <span class="keyword">else</span>
+0189    set_param(ud.LoadDistBlock,<span class="string">'Value'</span>,num2str(0));
+0190 <span class="keyword">end</span>
+0191 <span class="comment">% end LocalDist</span>
+0192 
+0193 
+0194 <span class="comment">%=============================================================================</span>
+0195 <span class="comment">% LocalDistParam</span>
+0196 <span class="comment">% The callback function for setting the load diturbance amplitude</span>
+0197 <span class="comment">%=============================================================================</span>
+0198 <a name="_sub9" href="#_subfunctions" class="code">function LocalDistParam</a>
+0199 ud = get(gcbf,<span class="string">'UserData'</span>);
+0200 <span class="keyword">if</span> get(ud.LoadDist,<span class="string">'Value'</span>)
+0201    set_param(ud.LoadDistBlock,<span class="string">'Value'</span>,get(ud.LoadAmp,<span class="string">'String'</span>));
+0202 <span class="keyword">end</span>
+0203 <span class="comment">% end LocalDistParam</span>
+0204 
+0205 
+0206 <span class="comment">%=============================================================================</span>
+0207 <span class="comment">% LocalStepPID</span>
+0208 <span class="comment">% The callback function for comparing step response with different</span>
+0209 <span class="comment">% autotuning method</span>
+0210 <span class="comment">%=============================================================================</span>
+0211 <a name="_sub10" href="#_subfunctions" class="code">function LocalStepPID</a>
+0212 <span class="keyword">global</span> MODELRUNNING
+0213 <span class="keyword">if</span> ~MODELRUNNING
+0214    <span class="keyword">try</span>
+0215       num = str2num(get_param(<span class="string">'AutotunerPID/Plant/Transfer Fcn'</span>,<span class="keyword">...</span>
+0216          <span class="string">'Numerator'</span>));
+0217       den = str2num(get_param(<span class="string">'AutotunerPID/Plant/Transfer Fcn'</span>,<span class="keyword">...</span>
+0218          <span class="string">'Denominator'</span>));
+0219       tau = str2num(get_param(<span class="string">'AutotunerPID/Plant/Transport Delay'</span>,<span class="keyword">...</span>
+0220          <span class="string">'Delay'</span>));
+0221    <span class="keyword">catch</span>
+0222       msgbox(<span class="string">'The step response can be computed only for linear models'</span>,<span class="keyword">...</span>
+0223          <span class="string">'AutotunerPID'</span>,<span class="string">'error'</span>);
+0224       <span class="keyword">return</span>
+0225    <span class="keyword">end</span>
+0226    <a href="stepPIDcompare.html" class="code" title="function stepPIDcompare(num,den,tau)">stepPIDcompare</a>(num,den,tau);
+0227 <span class="keyword">else</span>
+0228    msgbox(<span class="string">'The simulation must be STOPPED to perform the Comparative Analysis'</span>,<span class="keyword">...</span>
+0229          <span class="string">'AutotunerPID'</span>,<span class="string">'warn'</span>);
+0230 <span class="keyword">end</span>
+0231 <span class="comment">% end LocalStepPID</span>
+0232 
+0233 
+0234 <span class="comment">%=============================================================================</span>
+0235 <span class="comment">% LocalBodePID</span>
+0236 <span class="comment">% The callback function for comparing Bode diagram with different</span>
+0237 <span class="comment">% autotuning method</span>
+0238 <span class="comment">%=============================================================================</span>
+0239 <a name="_sub11" href="#_subfunctions" class="code">function LocalBodePID</a>
+0240 <span class="keyword">global</span> MODELRUNNING
+0241 <span class="keyword">if</span> ~MODELRUNNING
+0242    <span class="keyword">try</span>
+0243       num = str2num(get_param(<span class="string">'AutotunerPID/Plant/Transfer Fcn'</span>,<span class="string">'Numerator'</span>));
+0244       den = str2num(get_param(<span class="string">'AutotunerPID/Plant/Transfer Fcn'</span>,<span class="string">'Denominator'</span>));
+0245       tau = str2num(get_param(<span class="string">'AutotunerPID/Plant/Transport Delay'</span>,<span class="string">'Delay'</span>));
+0246    <span class="keyword">catch</span>
+0247       msgbox(<span class="string">'The Bode diagrams can be computed only for linear models'</span>,<span class="keyword">...</span>
+0248          <span class="string">'AutotunerPID'</span>,<span class="string">'error'</span>);
+0249       <span class="keyword">return</span>
+0250    <span class="keyword">end</span>
+0251    <a href="bodePIDcompare.html" class="code" title="function bodePIDcompare(num,den,tau)">bodePIDcompare</a>(num,den,tau);
+0252 <span class="keyword">else</span>
+0253    msgbox(<span class="string">'The simulation must be STOPPED to perform the Comparative Analysis'</span>,<span class="keyword">...</span>
+0254          <span class="string">'AutotunerPID'</span>,<span class="string">'warn'</span>);
+0255 <span class="keyword">end</span>
+0256 
+0257 <span class="comment">% end LocalBodePID</span>
+0258 
+0259 
+0260 <span class="comment">%=============================================================================</span>
+0261 <span class="comment">% LocalHlp</span>
+0262 <span class="comment">% The callback function for Help</span>
+0263 <span class="comment">%=============================================================================</span>
+0264 <a name="_sub12" href="#_subfunctions" class="code">function LocalHlp</a>
+0265 web([strrep(which(<span class="string">'envgui'</span>),<span class="string">'envgui.m'</span>,<span class="string">''</span>) <span class="string">'help/index.html'</span>],<span class="string">'-browser'</span>)
+0266 <span class="comment">% end LocalHlp</span>
+0267 
+0268 
+0269 <span class="comment">%=============================================================================</span>
+0270 <span class="comment">% LocalEnvSets</span>
+0271 <span class="comment">% Local function to set the position of the graphics objects in the Env GUI</span>
+0272 <span class="comment">% animation window.</span>
+0273 <span class="comment">%=============================================================================</span>
+0274 <a name="_sub13" href="#_subfunctions" class="code">function LocalEnvSets(time,ud,u)</a>
+0275 <span class="keyword">global</span> AUTOTUNE
+0276 <span class="keyword">global</span> ENVINACTIVE
+0277 
+0278 <span class="keyword">if</span> AUTOTUNE
+0279    set(ud.Noise,<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+0280    set(ud.NoiseVar,<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+0281    set(ud.LoadDist,<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+0282    set(ud.LoadAmp,<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+0283    ENVINACTIVE = 1;
+0284 <span class="keyword">elseif</span> ~AUTOTUNE &amp; ENVINACTIVE
+0285    <span class="comment">% Autotuning process completed (update parameters and set the GUI</span>
+0286    <span class="comment">% active)</span>
+0287    set(ud.Noise,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0288    set(ud.NoiseVar,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0289    set(ud.LoadDist,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0290    set(ud.LoadAmp,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0291    ENVINACTIVE = 0;
+0292 <span class="keyword">end</span>
+0293 
+0294 <span class="comment">% Force plot to be drawn</span>
+0295 pause(0), drawnow
+0296 <span class="comment">% end LocalEnvSets</span>
+0297 
+0298 
+0299 <span class="comment">%=============================================================================</span>
+0300 <span class="comment">% LocalEnvInit</span>
+0301 <span class="comment">% Local function to initialize the Env GUI animation.  If the animation</span>
+0302 <span class="comment">% window already exists, it is brought to the front.  Otherwise, a new</span>
+0303 <span class="comment">% figure window is created.</span>
+0304 <span class="comment">%=============================================================================</span>
+0305 <a name="_sub14" href="#_subfunctions" class="code">function LocalEnvInit(NoiseBlock,LoadDistBlock)</a>
+0306 <span class="comment">% The name of the reference is derived from the name of the</span>
+0307 <span class="comment">% subsystem block that owns the GUI S-function block.</span>
+0308 <span class="comment">% This subsystem is the current system and is assumed to be the same</span>
+0309 <span class="comment">% layer at which the reference block resides.</span>
+0310 sys = get_param(gcs,<span class="string">'Parent'</span>);
+0311 
+0312 <span class="keyword">global</span> AUTOTUNE
+0313 <span class="keyword">global</span> AUTOMAN
+0314 <span class="keyword">global</span> INACTIVE
+0315 
+0316 
+0317 <span class="comment">% The animation figure handle is stored in the GUI block's UserData.</span>
+0318 <span class="comment">% If it exists, initialize all the fields</span>
+0319 Fig = get_param(gcbh,<span class="string">'UserData'</span>);
+0320 <span class="keyword">if</span> ishandle(Fig),
+0321    FigUD = get(Fig,<span class="string">'UserData'</span>);
+0322    
+0323    set(FigUD.Noise,<span class="keyword">...</span>
+0324       <span class="string">'Value'</span>,0,<span class="keyword">...</span>
+0325       <span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0326    set(FigUD.NoiseVar,<span class="keyword">...</span>
+0327       <span class="string">'String'</span>,<span class="string">'0.0001'</span>,<span class="keyword">...</span>
+0328       <span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0329    set(FigUD.LoadDist,<span class="keyword">...</span>
+0330       <span class="string">'Value'</span>,0,<span class="keyword">...</span>
+0331       <span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0332    set(FigUD.LoadAmp,<span class="keyword">...</span>
+0333       <span class="string">'String'</span>,<span class="string">'1'</span>,<span class="keyword">...</span>
+0334       <span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0335    
+0336    <span class="comment">% bring it to the front</span>
+0337    figure(Fig);
+0338    <span class="keyword">return</span>
+0339 <span class="keyword">end</span>
+0340 
+0341 <span class="comment">% the animation figure doesn't exist, create a new one and store its</span>
+0342 <span class="comment">% handle in the animation block's UserData</span>
+0343 FigureName = <span class="string">'Environment Panel'</span>;
+0344 
+0345 <span class="comment">% Figure</span>
+0346 FigH = 150;                <span class="comment">% figure height</span>
+0347 FigW = 272;                <span class="comment">% figure width</span>
+0348 Fig = figure(<span class="keyword">...</span>
+0349    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0350    <span class="string">'Position'</span>,           [100 300-FigH FigW FigH],<span class="keyword">...</span>
+0351    <span class="string">'Name'</span>,               FigureName,<span class="keyword">...</span>
+0352    <span class="string">'NumberTitle'</span>,        <span class="string">'off'</span>,<span class="keyword">...</span>
+0353    <span class="string">'IntegerHandle'</span>,      <span class="string">'off'</span>,<span class="keyword">...</span>
+0354    <span class="string">'HandleVisibility'</span>,   <span class="string">'callback'</span>,<span class="keyword">...</span>
+0355    <span class="string">'Resize'</span>,             <span class="string">'off'</span>,<span class="keyword">...</span>
+0356    <span class="string">'MenuBar'</span>,            <span class="string">'none'</span>,<span class="keyword">...</span>
+0357    <span class="string">'DoubleBuffer'</span>,       <span class="string">'on'</span>,<span class="keyword">...</span>
+0358    <span class="string">'DeleteFcn'</span>,          <span class="string">'envgui([],[],[],''DeleteFigure'')'</span>,<span class="keyword">...</span>
+0359    <span class="string">'CloseRequestFcn'</span>,    <span class="string">'envgui([],[],[],''Close'');'</span>);
+0360 
+0361 <span class="comment">% operating condition</span>
+0362 uicontrol(<span class="keyword">...</span>
+0363    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0364    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0365    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0366    <span class="string">'Position'</span>,           [12 FigH-19 140 14], <span class="keyword">...</span>
+0367    <span class="string">'HorizontalAlignment'</span>,<span class="string">'left'</span>,<span class="keyword">...</span>
+0368    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0369    <span class="string">'Backgroundcolor'</span>,    [0.8 0.8 0.8],<span class="keyword">...</span>
+0370    <span class="string">'String'</span>,             <span class="string">'Operating Conditions'</span>);
+0371 uicontrol(<span class="keyword">...</span>
+0372    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0373    <span class="string">'Style'</span>,              <span class="string">'frame'</span>,<span class="keyword">...</span>
+0374    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0375    <span class="string">'Position'</span>,           [12 FigH-64 248 44]);
+0376 Noise = uicontrol(<span class="keyword">...</span>
+0377    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0378    <span class="string">'Style'</span>,              <span class="string">'checkbox'</span>,<span class="keyword">...</span>
+0379    <span class="string">'Position'</span>,           [16 FigH-42 140 18],<span class="keyword">...</span>
+0380    <span class="string">'String'</span>,             <span class="string">'Measurement noise'</span>,<span class="keyword">...</span>
+0381    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0382    <span class="string">'Value'</span>,              0,<span class="keyword">...</span>
+0383    <span class="string">'Callback'</span>,           <span class="string">'envgui([],[],[],''Noise'');'</span>);
+0384 uicontrol(<span class="keyword">...</span>
+0385    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0386    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0387    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0388    <span class="string">'Position'</span>,           [156 FigH-40 40 14], <span class="keyword">...</span>
+0389    <span class="string">'HorizontalAlignment'</span>,<span class="string">'right'</span>,<span class="keyword">...</span>
+0390    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0391    <span class="string">'String'</span>,             <span class="string">'var. '</span>);
+0392 NoiseVar = uicontrol(<span class="keyword">...</span>
+0393    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0394    <span class="string">'Style'</span>,              <span class="string">'edit'</span>,<span class="keyword">...</span>
+0395    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0396    <span class="string">'Position'</span>,           [196 FigH-42 60 18], <span class="keyword">...</span>
+0397    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0398    <span class="string">'String'</span>,             <span class="string">'0.0001'</span>,<span class="keyword">...</span>
+0399    <span class="string">'Backgroundcolor'</span>,    [1 1 1],<span class="keyword">...</span>
+0400    <span class="string">'Callback'</span>,           <span class="string">'envgui([],[],[],''NoiseParam'');'</span>);
+0401 LoadDist = uicontrol(<span class="keyword">...</span>
+0402    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0403    <span class="string">'Style'</span>,              <span class="string">'checkbox'</span>,<span class="keyword">...</span>
+0404    <span class="string">'Position'</span>,           [16 FigH-62 150 18],<span class="keyword">...</span>
+0405    <span class="string">'String'</span>,             <span class="string">'Load disturbance'</span>,<span class="keyword">...</span>
+0406    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0407    <span class="string">'Value'</span>,              0,<span class="keyword">...</span>
+0408    <span class="string">'Callback'</span>,           <span class="string">'envgui([],[],[],''Dist'');'</span>);
+0409 uicontrol(<span class="keyword">...</span>
+0410    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0411    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0412    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0413    <span class="string">'Position'</span>,           [166 FigH-60 30 14], <span class="keyword">...</span>
+0414    <span class="string">'HorizontalAlignment'</span>,<span class="string">'right'</span>,<span class="keyword">...</span>
+0415    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0416    <span class="string">'String'</span>,             <span class="string">'amp. '</span>);
+0417 LoadAmp = uicontrol(<span class="keyword">...</span>
+0418    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0419    <span class="string">'Style'</span>,              <span class="string">'edit'</span>,<span class="keyword">...</span>
+0420    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0421    <span class="string">'Position'</span>,           [196 FigH-60 60 18], <span class="keyword">...</span>
+0422    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0423    <span class="string">'String'</span>,             <span class="string">'1'</span>,<span class="keyword">...</span>
+0424    <span class="string">'Backgroundcolor'</span>,    [1 1 1],<span class="keyword">...</span>
+0425    <span class="string">'Callback'</span>,           <span class="string">'envgui([],[],[],''DistParam'');'</span>);
+0426 
+0427 <span class="comment">% compact analysis</span>
+0428 uicontrol(<span class="keyword">...</span>
+0429    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0430    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0431    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0432    <span class="string">'Position'</span>,           [12 FigH-88 240 14], <span class="keyword">...</span>
+0433    <span class="string">'HorizontalAlignment'</span>,<span class="string">'left'</span>,<span class="keyword">...</span>
+0434    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0435    <span class="string">'FontSize'</span>,           8,<span class="keyword">...</span>
+0436    <span class="string">'Backgroundcolor'</span>,    [0.8 0.8 0.8],<span class="keyword">...</span>
+0437    <span class="string">'String'</span>,             <span class="string">'Comparative Analysis'</span>);
+0438 uicontrol(<span class="keyword">...</span>
+0439    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0440    <span class="string">'Style'</span>,              <span class="string">'frame'</span>,<span class="keyword">...</span>
+0441    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0442    <span class="string">'Position'</span>,           [12 FigH-118 248 28]);
+0443 uicontrol(<span class="keyword">...</span>
+0444    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0445    <span class="string">'Style'</span>,              <span class="string">'pushbutton'</span>,<span class="keyword">...</span>
+0446    <span class="string">'Position'</span>,           [22 FigH-114 72 20],<span class="keyword">...</span>
+0447    <span class="string">'String'</span>,             <span class="string">'Time'</span>, <span class="keyword">...</span>
+0448    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0449    <span class="string">'Callback'</span>,           <span class="string">'envgui([],[],[],''StepPID'');'</span>);
+0450 uicontrol(<span class="keyword">...</span>
+0451    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0452    <span class="string">'Style'</span>,              <span class="string">'pushbutton'</span>,<span class="keyword">...</span>
+0453    <span class="string">'Position'</span>,           [176 FigH-114 72 20],<span class="keyword">...</span>
+0454    <span class="string">'String'</span>,             <span class="string">'Frequency'</span>, <span class="keyword">...</span>
+0455    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0456    <span class="string">'Callback'</span>,           <span class="string">'envgui([],[],[],''BodePID'');'</span>);
+0457 <span class="comment">% help button</span>
+0458 uicontrol(<span class="keyword">...</span>
+0459    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0460    <span class="string">'Style'</span>,              <span class="string">'pushbutton'</span>,<span class="keyword">...</span>
+0461    <span class="string">'Position'</span>,           [100 FigH-145 72 20],<span class="keyword">...</span>
+0462    <span class="string">'String'</span>,             <span class="string">'Help'</span>, <span class="keyword">...</span>
+0463    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0464    <span class="string">'Callback'</span>,           <span class="string">'envgui([],[],[],''Hlp'');'</span>);
+0465 
+0466 
+0467 <span class="comment">% all the HG objects are created, store them into the Figure's UserData</span>
+0468 
+0469 <span class="comment">% operating conditions</span>
+0470 FigUD.Noise        = Noise;
+0471 FigUD.NoiseVar     = NoiseVar;
+0472 FigUD.LoadDist     = LoadDist;
+0473 FigUD.LoadAmp      = LoadAmp;
+0474 <span class="comment">% Simulink Block Interaction</span>
+0475 FigUD.Block        = get_param(gcbh,<span class="string">'Handle'</span>);
+0476 FigUD.NoiseBlock   = get_param([sys <span class="string">'/'</span> NoiseBlock],<span class="string">'Handle'</span>);
+0477 FigUD.LoadDistBlock= get_param([sys <span class="string">'/'</span> LoadDistBlock],<span class="string">'Handle'</span>);
+0478 
+0479 set(Fig,<span class="string">'UserData'</span>,FigUD);
+0480 
+0481 drawnow
+0482 
+0483 <span class="comment">% store the figure handle in the animation block's UserData</span>
+0484 set_param(gcbh,<span class="string">'UserData'</span>,Fig);
+0485 <span class="comment">% end LocalEnvInit</span></pre></div>
+<br>
+<p><table bgcolor="#ffe4b0" border=0 width="100%" cellpadding=0 cellspacing=0><tr valign=top><td align=left width=20><a href="butterdesign.html"><img src="b_prev.gif" alt="Previous page" border=0 align=bottom></a>&nbsp;</td><td align=left>&nbsp;butterdesign</td><td>&nbsp;</td><td align=right>idareas&nbsp;</td><td align=right width=20><a href="idareas.html"><img src="b_next.gif" alt="Next page" border=0 align=bottom></a></td></tr></table>
+<br>
+<address>Generated on Wed 17-Mar-2004 09:29:44 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

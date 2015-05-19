@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of pid_structure</title>
+  <meta name="keywords" content="pid_structure">
+  <meta name="description" content="PID_STRUCTURE Structure selection for a ISA PID regulator.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="m2html.css">
+</head>
+<body>
+
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline bgcolor="#ffe4b0"><b>AutotunerPID Toolkit</b></td>
+<td valign=baseline bgcolor="#ffe4b0" align=right><a href="pid_isatd.html"><img src="b_prev.gif" alt="Previous page" border=0></a>&nbsp;&nbsp;&nbsp;<a href="pid_tuning.html"><img src="b_next.gif" alt="Next Page" border=0></a></td>
+</tr>
+</table>
+
+<h1>pid_structure</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="box"><strong>Structure selection for a ISA-PID regulator.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="box"><strong>function regStruct = pid_structure(model,reqStruct) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="fragment"><pre class="comment">PID_STRUCTURE Structure selection for a ISA PID regulator.
+
+   REGSTRUCT = PID_STRUCTURE(MODEL,REQSTRUCT) returns the ``best''
+   structure for the regulator, assuming that the controlled plant can be
+   described with a FOPDT model.
+   MODEL is a structure with the description of the process model with the
+   fields {m L T} (parameters of a FOPDT model M(s) = m*exp(-sL)/(1+s*T)).
+   The structure may be computed through the function setting the flag
+   REQSTRUCT to 'AUTO', or may be constrained to a particular one by
+   setting the flag REQSTRUCT to 'PI' or 'PID' respectively.
+
+   The structure selection is performed only if a FOPDT model of the
+   process is given, otherwise the PID structure is selected.  If the
+   control problem is intrinsically difficult the PID structure is
+   selected, and a warning message is prompted.
+
+   Author:    William Spinelli (wspinell@elet.polimi.it)
+   Copyright  2004 W.Spinelli
+   $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(matlabicon.gif)">
+<li><a href="pid_autotuner.html" class="code" title="function [sys,x0,str,ts] = pid_autotuner(t,x,u,flag,Ts,As)">pid_autotuner</a>	PID_SUPERV Supervisor of a PID autotuner (implmented as an S-function)</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function regStruct = pid_structure(model,reqStruct)</a>
+0002 <span class="comment">%PID_STRUCTURE Structure selection for a ISA-PID regulator.</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%   REGSTRUCT = PID_STRUCTURE(MODEL,REQSTRUCT) returns the ``best''</span>
+0005 <span class="comment">%   structure for the regulator, assuming that the controlled plant can be</span>
+0006 <span class="comment">%   described with a FOPDT model.</span>
+0007 <span class="comment">%   MODEL is a structure with the description of the process model with the</span>
+0008 <span class="comment">%   fields {m L T} (parameters of a FOPDT model M(s) = m*exp(-sL)/(1+s*T)).</span>
+0009 <span class="comment">%   The structure may be computed through the function setting the flag</span>
+0010 <span class="comment">%   REQSTRUCT to 'AUTO', or may be constrained to a particular one by</span>
+0011 <span class="comment">%   setting the flag REQSTRUCT to 'PI' or 'PID' respectively.</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%   The structure selection is performed only if a FOPDT model of the</span>
+0014 <span class="comment">%   process is given, otherwise the PID structure is selected.  If the</span>
+0015 <span class="comment">%   control problem is intrinsically difficult the PID structure is</span>
+0016 <span class="comment">%   selected, and a warning message is prompted.</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%   Author:    William Spinelli (wspinell@elet.polimi.it)</span>
+0019 <span class="comment">%   Copyright  2004 W.Spinelli</span>
+0020 <span class="comment">%   $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $</span>
+0021 
+0022 <span class="keyword">if</span> nargin &lt; 2
+0023    reqStruct = <span class="string">'AUTO'</span>;
+0024 <span class="keyword">end</span>
+0025 
+0026 <span class="keyword">switch</span> reqStruct
+0027    <span class="keyword">case</span> <span class="string">'PI'</span>
+0028       <span class="comment">% override selection</span>
+0029       regStruct  = <span class="string">'PI'</span>;
+0030       
+0031    <span class="keyword">case</span> <span class="string">'PID'</span>
+0032       <span class="comment">% override selection</span>
+0033       regStruct  = <span class="string">'PID'</span>;
+0034       
+0035    <span class="keyword">case</span> <span class="string">'AUTO'</span>
+0036       <span class="keyword">if</span> isfield(model,<span class="string">'m'</span>)
+0037          <span class="comment">% selection performed only if a FOPDT model is provided</span>
+0038          m = model.m; L = model.L; T = model.T;
+0039          
+0040          <span class="comment">% compute the ultimate frequency</span>
+0041          wmin = (-pi/2)/L;    <span class="comment">% lower bound</span>
+0042          wmax = (-pi)/L;      <span class="comment">% upper bound</span>
+0043          w    = real(logspace(log10(wmin),log10(wmax),1024));
+0044          phaseM = angle(m*exp(-j*L*w)./(1+j*w*T));
+0045          wu = w(find(phaseM==min(phaseM)));
+0046          
+0047          k1  = 1/abs(m*exp(-j*L*wu)/(1+j*wu*T));
+0048          th1 = L/T;
+0049          
+0050          <span class="keyword">if</span> th1&gt;1 &amp; k1&lt;1.5
+0051             regStruct = <span class="string">'PI'</span>;
+0052             msgbox(<span class="string">'Bad results expected'</span>,<span class="string">'AutotunerPID'</span>,<span class="string">'warn'</span>);
+0053          <span class="keyword">elseif</span> (th1&gt;0.6 &amp; th1&lt;1) &amp; (k1&gt;1.5 &amp; k1&lt;2.25)
+0054             regStruct = <span class="string">'PI'</span>;
+0055          <span class="keyword">elseif</span> th1&lt;0.6 &amp; k1&gt;2.25
+0056             regStruct = <span class="string">'PID'</span>;
+0057          <span class="keyword">else</span>
+0058             regStruct = <span class="string">'PID'</span>;
+0059             msgbox(<span class="string">'Bad results expected'</span>,<span class="string">'AutotunerPID'</span>,<span class="string">'warn'</span>);
+0060          <span class="keyword">end</span>
+0061       <span class="keyword">else</span>
+0062          regStruct = <span class="string">'PID'</span>;
+0063       <span class="keyword">end</span>
+0064       
+0065    <span class="keyword">otherwise</span>
+0066       msgbox(<span class="string">'Unknown structure'</span>,<span class="string">'AutotunerPID'</span>,<span class="string">'warn'</span>);
+0067       regStruct  = <span class="string">'PID'</span>;
+0068 <span class="keyword">end</span></pre></div>
+<br>
+<p><table bgcolor="#ffe4b0" border=0 width="100%" cellpadding=0 cellspacing=0><tr valign=top><td align=left width=20><a href="pid_isatd.html"><img src="b_prev.gif" alt="Previous page" border=0 align=bottom></a>&nbsp;</td><td align=left>&nbsp;pid_isatd</td><td>&nbsp;</td><td align=right>pid_tuning&nbsp;</td><td align=right width=20><a href="pid_tuning.html"><img src="b_next.gif" alt="Next page" border=0 align=bottom></a></td></tr></table>
+<br>
+<address>Generated on Wed 17-Mar-2004 09:29:44 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<html><head><title>PID Control Panel :: Getting started with AutotunerPID Toolkit (AutotunerPID Toolkit)</title>
+<!-- $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $ -->
+
+<!-- DOCNAME: AutotunerPID Toolkit -->
+<!-- CHUNKNAME: PID Control Panel -->
+<!-- CHAPNAME: Getting started with AutotunerPID Toolkit -->
+<!-- HEADSTUFF -->
+<link href="docstyle1.css" rel="stylesheet" type="text/css">
+</head>
+<body bgcolor=#ffffff>
+<!-- NAVBARTOP -->
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline bgcolor="#ffe4b0"><b>AutotunerPID Toolkit</b></td>
+<td valign=baseline bgcolor="#ffe4b0" align=right><a href="autopid_si2.html"><img src="b_prev.gif" alt="Previous page" border=0></a>&nbsp;&nbsp;&nbsp;<a href="autopid_si4.html"><img src="b_next.gif" alt="Next Page" border=0></a></td>
+</tr>
+</table>
+
+
+<a name="process_identification"></a><!-- H1 -->
+<p><font size=+2 color="#990000"><b>PID Control Panel</b></font><br>
+<p>The <em>PID Control Panel</em> is designed to closer resemble
+  the layout of a typical real industrial autotuner (at least in the control
+  options).</p>
+<table width="100%" border="0">
+	<tr>
+		<td align="center"><strong>Linux</strong></td>
+		<td align="center"><strong>Windows</strong></td>
+	</tr>
+  <tr><td align="center"><img src="images/ControlPanelLinux.png"></td>
+    <td align="center"><img src="images/ControlPanelWindows.png"></td>
+  </tr>
+</table>
+<p>In the following we will briefly summarize the characteristics of this
+	interface, which is mainly split in four areas.</p>
+<p><ul><table border=1 cellspacing=0 cellpadding=5 width="90%"><tr>
+  <td bgcolor="#ffe4b0"><b>Note </b>&nbsp;&nbsp; The GUIs control the value of the <em>set-point</em>, <em>load
+      disturbance</em> and
+      <em>measurement noise</em> through a reference to the name of the corresponding blocks. It is suggested
+      that you DON'T change the name of this block. If you do this, you must also change the reference
+      in the masks of the block &quot;PID Control Panel&quot; and
+			&quot;Environment Panel&quot;</a></td>
+</tr></table></ul></p>
+
+<a name="parameters_area"></a><!-- H2 --><a name="t1"></a>
+<p><font size=+1 color="#990000"><b>Process Controls</b></font><br>
+<p>The upper part of the GUI is used to interact with the control system:
+<ul>
+	<li><strong>Changing the set-point value (SP)</strong> through the <em>SP slider</em> or the <em>SP text field</em>.
+		The value of the set-point is also shown graphically by the yellow triangle on the PV axis;</li>
+	<li><strong>Reading the process value (PV)</strong> through the <em>PV axis</em> or the <em>PV text field</em>;</li>
+	<li><strong>Reading the value of the control variable (CV)</strong> through the <em>CV axis</em> or the <em>CV text field</em>
+		when the regulator is in <em>Auto</em> mode or <strong>changing the CV</strong> through the <em>CV-MAN slider</em> 
+		or the <em>CV text field</em> when the regulator is in <em>Manual</em> mode.
+</ul></p>
+
+<a name="parameters_area"></a><!-- H2 --><a name="t2"></a>
+<p><font size=+1 color="#990000"><b>Parameters</b></font><br>
+<p>It shows the current values of the six ISA-PID parameters (<font face="Courier New, Courier, mono">K</font>,
+	<font face="Courier New, Courier, mono">Ti</font>, <font face="Courier New, Courier, mono">Td</font>,
+	<font face="Courier New, Courier, mono">N</font>, <font face="Courier New, Courier, mono">b</font>,
+	<font face="Courier New, Courier, mono">c</font>). All the parameters are editable
+ 	except the weight of the derivative action that is constant (<font face="Courier New, Courier, mono">c=0</font>).
+ The changes affect the system immediately.</p>
+
+<a name="operating_mode_area"></a><!-- H2 --><a name="t3"></a>
+<p><font size=+1 color="#990000"><b>Operating Mode</b></font><br>
+<p>It allows to controls the running mode of the PID regulator system. In <em>Auto</em> mode,
+  the value of the control variable is computed by the PID regulator, and the
+  CV-MAN slider and the CV edit area are both disabled. In <em>Manual</em>
+	mode the CV is defined manually by the user with either the CV-MAN slider
+	or the CV edit area.</p>
+<p>Autotuning can be performed either in Manual or in Auto mode. In the first case, however, the PID regulator does not
+	commute automatically to Auto mode after the completion of the autotuning process.</p>
+
+<a name="operating_mode_area"></a><!-- H2 --><a name="t4"></a>
+<p><font size=+1 color="#990000"><b>Autotuner</b></font><br>
+<p>It manages the autotuning process, through the following settings:</p>
+<ul>
+	<li><strong>Identification method</strong>:
+		a pop-up menu that allows the selection of the desired Identification Method (<a href="autopid_in3.html#t1">Areas</a>,
+		<a href="autopid_in3.html#t2">Relay</a>);</li>
+	<li><strong>Tuning method</strong>: 
+		a pop-up menu that allows the selection of the desired Tuning Method (<a href="autopid_in4.html#t3">IMC</a>, <a href="autopid_in4.html#t2">KT</a>,
+		<a href="autopid_in4.html#t1">ZN(OL)</a>, <a href="autopid_in4.html#t4">ZN(CL)</a>). If the IMC method
+		is selected, the <font face="Courier New, Courier, mono">lambda</font> parameter must be chosen. If
+		the KT method is selected the
+		<font face="Courier New, Courier, mono">M<sub>s</sub></font> parameters must be chosen between two
+		values (1.4 or 2.0);</li>
+	<li><strong>Structure</strong>:
+		a pop-up menu that allows the selection of the regulator structure: PI, PID or auto (the tool automatically chooses
+		the &quot;best&quot; one);</li>
+	<li><strong>Autotune button</strong>:
+		used to start the autotuning process (including the identification experiment and the synthesis of the parameters). 
+		The PID parameters are updated at the end of the autotuning process. During the autotuning process the interface is
+		&quot;frozen&quot; to prevent changes in the PID parameters or in the operating conditions.</li>
+</ul>
+<br>
+
+<p><table bgcolor="#ffe4b0" border=0 width="100%" cellpadding=0 cellspacing=0><tr valign=top><td align=left width=20><a href="autopid_si2.html"><img src="b_prev.gif" alt="Previous page" border=0 align=bottom></a>&nbsp;</td><td align=left>&nbsp;Setting up the Simulation</td><td>&nbsp;</td><td align=right>Environment Panel&nbsp;</td><td align=right width=20><a href="autopid_si4.html"><img src="b_next.gif" alt="Next page" border=0 align=bottom></a></td></tr></table>
+<br>
+
+<!-- Copyright 2004 W.Spinelli -->
+<!-- Last updated: Sat Feb 28 12:00:00 2004 -->
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of bodePIDcompare</title>
+  <meta name="keywords" content="bodePIDcompare">
+  <meta name="description" content="BODEPIDCOMPARE  Comparison of Bode Diagrams with different autotuning">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="m2html.css">
+</head>
+<body>
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline bgcolor="#ffe4b0"><b>AutotunerPID Toolkit</b></td>
+<td valign=baseline bgcolor="#ffe4b0" align=right><a href="autogui.html"><img src="b_prev.gif" alt="Previous page" border=0></a>&nbsp;&nbsp;&nbsp;<a href="butterdesign.html"><img src="b_next.gif" alt="Next Page" border=0></a></td>
+</tr>
+</table>
+
+<h1>bodePIDcompare</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="box"><strong>Comparison of Bode Diagrams with different autotuning method.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="box"><strong>function bodePIDcompare(num,den,tau) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="fragment"><pre class="comment">BODEPIDCOMPARE Comparison of Bode Diagrams with different autotuning
+   methods
+   
+   The function is typically called through the GUI in AutotunerPID.mdl
+   and provides a graphical comparison of four different autotuning
+   methods (STEP/ZN(OL), STEP/KT, STEP/IMC, RELAY/ZN(CL)) in frequency
+   domain. 
+   By default the parameter Ms is set to 2 in KT methods, while the
+   parameter lambda is set 1/5 of the settling time of the plant.
+   
+   
+   BODEPIDCOMPARE(NUM,DEN,TAU) performs the comparative analysis directly
+   considering the plant described by the transfer function
+              NUM(s)
+      P(s) = -------- * exp(-TAU*s)
+              DEN(s)
+
+   See also STEPPID
+
+   Author:    William Spinelli (wspinell@elet.polimi.it)
+   Copyright  2004 W.Spinelli
+   $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(matlabicon.gif)">
+<li><a href="idareas.html" class="code" title="function model = idareas(y,As,Ts)">idareas</a>	IDAREAS Identification of a FOPDT model using the method of the</li><li><a href="pid_tuning.html" class="code" title="function [K,Ti,Td,N,b] = pid_tuning(model,method,param,regStruct,As)">pid_tuning</a>	PID_TUNING Tune the parameters of a ISA-PID regulator with some</li></ul>
+This function is called by:
+<ul style="list-style-image:url(matlabicon.gif)">
+<li><a href="envgui.html" class="code" title="function [sys,x0,str,ts] = envgui(t,x,u,flag,NoiseBlock,LoadDistBlock)">envgui</a>	ENVGUI S-function for making a simple PID GUI</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function bodePIDcompare(num,den,tau)</a>
+0002 <span class="comment">%BODEPIDCOMPARE  Comparison of Bode Diagrams with different autotuning</span>
+0003 <span class="comment">%   methods</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%   The function is typically called through the GUI in AutotunerPID.mdl</span>
+0006 <span class="comment">%   and provides a graphical comparison of four different autotuning</span>
+0007 <span class="comment">%   methods (STEP/ZN(OL), STEP/KT, STEP/IMC, RELAY/ZN(CL)) in frequency</span>
+0008 <span class="comment">%   domain.</span>
+0009 <span class="comment">%   By default the parameter Ms is set to 2 in KT methods, while the</span>
+0010 <span class="comment">%   parameter lambda is set 1/5 of the settling time of the plant.</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%   BODEPIDCOMPARE(NUM,DEN,TAU) performs the comparative analysis directly</span>
+0014 <span class="comment">%   considering the plant described by the transfer function</span>
+0015 <span class="comment">%              NUM(s)</span>
+0016 <span class="comment">%      P(s) = -------- * exp(-TAU*s)</span>
+0017 <span class="comment">%              DEN(s)</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%   See also STEPPID</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">%   Author:    William Spinelli (wspinell@elet.polimi.it)</span>
+0022 <span class="comment">%   Copyright  2004 W.Spinelli</span>
+0023 <span class="comment">%   $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $</span>
+0024 
+0025 <span class="keyword">global</span> PIDPARAMETERS
+0026 
+0027 <span class="comment">% Bode diagram of the real plant model</span>
+0028 P = tf(num,den,<span class="string">'IODelay'</span>,tau);
+0029 [m,f,w] = bode(P);
+0030 w = logspace(log10(w(1)),log10(w(end)),512);
+0031 s = j*w;
+0032 
+0033 <span class="comment">% compute step response</span>
+0034 [y,t] = step(P);
+0035 Ts = min(real(abs(pole(P))))/50;
+0036 [y,t] = step(P,0:Ts:t(end));
+0037 Tf = t(end);
+0038 
+0039 <span class="comment">% identify a FOPDT model</span>
+0040 modelFOPDT = <a href="idareas.html" class="code" title="function model = idareas(y,As,Ts)">idareas</a>(y,1,Ts);
+0041 
+0042 <span class="comment">% identify the point of the frequency response with omega_n = -pi</span>
+0043 [Gm,Pm,Wcg,Wcp] = margin(P);
+0044 modelPI.A = 2/Gm;
+0045 modelPI.T = 2*pi/Wcg;
+0046 
+0047 <span class="comment">% evaluate the frequency response of the plant</span>
+0048 P = squeeze(freqresp(P,w)).';
+0049 
+0050 <span class="comment">% Create new figure</span>
+0051 Lfig = figure(<span class="keyword">...</span>
+0052    <span class="string">'Name'</span>,               <span class="string">'Bode diagram - Open loop function'</span>,<span class="keyword">...</span>
+0053    <span class="string">'NumberTitle'</span>,        <span class="string">'off'</span>,<span class="keyword">...</span>
+0054    <span class="string">'MenuBar'</span>,            <span class="string">'figure'</span>);
+0055 Ffig = figure(<span class="keyword">...</span>
+0056    <span class="string">'Name'</span>,               <span class="string">'Bode diagram - Complementary sensitivity'</span>,<span class="keyword">...</span>
+0057    <span class="string">'NumberTitle'</span>,        <span class="string">'off'</span>,<span class="keyword">...</span>
+0058    <span class="string">'MenuBar'</span>,            <span class="string">'figure'</span>);
+0059 Sfig = figure(<span class="keyword">...</span>
+0060    <span class="string">'Name'</span>,               <span class="string">'Bode diagram - Sensitivity'</span>,<span class="keyword">...</span>
+0061    <span class="string">'NumberTitle'</span>,        <span class="string">'off'</span>,<span class="keyword">...</span>
+0062    <span class="string">'MenuBar'</span>,            <span class="string">'figure'</span>);
+0063 
+0064 <span class="comment">% Bode diagrams with different autotuner</span>
+0065 <span class="comment">% Ziegler &amp; Nichols with Step identification</span>
+0066 [K,Ti,Td,N,b] = <a href="pid_tuning.html" class="code" title="function [K,Ti,Td,N,b] = pid_tuning(model,method,param,regStruct,As)">pid_tuning</a>(modelFOPDT,<span class="string">'ZN (OL)'</span>,[],<span class="string">'PID'</span>);
+0067 Rff = K*(b+1./(Ti*s));
+0068 Rfb = K*(1+1./(Ti*s)+(Td*s)./(1+Td*s/N));
+0069 L = Rfb.*P;
+0070 F = (Rff.*P)./(ones(1,length(P))+(Rfb.*P));
+0071 S = 1./(ones(1,length(P))+(Rfb.*P));
+0072 figure(Lfig)
+0073 subplot(211), semilogx(w,20*log10(abs(L)),<span class="string">'b'</span>)
+0074 subplot(212), semilogx(w,unwrap(angle(L))/pi*180,<span class="string">'b'</span>)
+0075 figure(Ffig)
+0076 subplot(211), semilogx(w,20*log10(abs(F)),<span class="string">'b'</span>)
+0077 subplot(212), semilogx(w,unwrap(angle(F))/pi*180,<span class="string">'b'</span>)
+0078 figure(Sfig)
+0079 subplot(211), semilogx(w,20*log10(abs(S)),<span class="string">'b'</span>)
+0080 subplot(212), semilogx(w,unwrap(angle(S))/pi*180,<span class="string">'b'</span>)
+0081 
+0082 <span class="comment">% Kappa-Tau with Ms = 2</span>
+0083 <span class="comment">% in order to obtain better performance</span>
+0084 [K,Ti,Td,N,b] = <a href="pid_tuning.html" class="code" title="function [K,Ti,Td,N,b] = pid_tuning(model,method,param,regStruct,As)">pid_tuning</a>(modelFOPDT,<span class="string">'KT'</span>,2,<span class="string">'PID'</span>);
+0085 Rff = K*(b+1./(Ti*s));
+0086 Rfb = K*(1+1./(Ti*s)+(Td*s)./(1+Td*s/N));
+0087 L = Rfb.*P;
+0088 F = (Rff.*P)./(ones(1,length(P))+(Rfb.*P));
+0089 S = 1./(ones(1,length(P))+(Rfb.*P));
+0090 figure(Lfig)
+0091 subplot(211), hold on, semilogx(w,20*log10(abs(L)),<span class="string">'r'</span>)
+0092 subplot(212), hold on, semilogx(w,unwrap(angle(L))/pi*180,<span class="string">'r'</span>)
+0093 figure(Ffig)
+0094 subplot(211), hold on, semilogx(w,20*log10(abs(F)),<span class="string">'r'</span>)
+0095 subplot(212), hold on, semilogx(w,unwrap(angle(F))/pi*180,<span class="string">'r'</span>)
+0096 figure(Sfig)
+0097 subplot(211), hold on, semilogx(w,20*log10(abs(S)),<span class="string">'r'</span>)
+0098 subplot(212), hold on, semilogx(w,unwrap(angle(S))/pi*180,<span class="string">'r'</span>)
+0099 
+0100 <span class="comment">% Internal Model Control with lambda = Tf/5</span>
+0101 <span class="comment">% this means that the closed loop model is made five time faster than the</span>
+0102 <span class="comment">% original (open loop model)</span>
+0103 [K,Ti,Td,N,b] = <a href="pid_tuning.html" class="code" title="function [K,Ti,Td,N,b] = pid_tuning(model,method,param,regStruct,As)">pid_tuning</a>(modelFOPDT,<span class="string">'IMC'</span>,Tf/5,<span class="string">'PID'</span>);
+0104 Rff = K*(b+1./(Ti*s));
+0105 Rfb = K*(1+1./(Ti*s)+(Td*s)./(1+Td*s/N));
+0106 L = Rfb.*P;
+0107 F = (Rff.*P)./(ones(1,length(P))+(Rfb.*P));
+0108 S = 1./(ones(1,length(P))+(Rfb.*P));
+0109 figure(Lfig)
+0110 subplot(211), hold on, semilogx(w,20*log10(abs(L)),<span class="string">'g'</span>)
+0111 subplot(212), hold on, semilogx(w,unwrap(angle(L))/pi*180,<span class="string">'g'</span>)
+0112 figure(Ffig)
+0113 subplot(211), hold on, semilogx(w,20*log10(abs(F)),<span class="string">'g'</span>)
+0114 subplot(212), hold on, semilogx(w,unwrap(angle(F))/pi*180,<span class="string">'g'</span>)
+0115 figure(Sfig)
+0116 subplot(211), hold on, semilogx(w,20*log10(abs(S)),<span class="string">'g'</span>)
+0117 subplot(212), hold on, semilogx(w,unwrap(angle(S))/pi*180,<span class="string">'g'</span>)
+0118 
+0119 <span class="comment">% Ziegler &amp; Nichols with Relay identification</span>
+0120 [K,Ti,Td,N,b] = <a href="pid_tuning.html" class="code" title="function [K,Ti,Td,N,b] = pid_tuning(model,method,param,regStruct,As)">pid_tuning</a>(modelPI,<span class="string">'ZN (CL)'</span>,[],<span class="string">'PID'</span>);
+0121 Rff = K*(b+1./(Ti*s));
+0122 Rfb = K*(1+1./(Ti*s)+(Td*s)./(1+Td*s/N));
+0123 L = Rfb.*P;
+0124 F = (Rff.*P)./(ones(1,length(P))+(Rfb.*P));
+0125 S = 1./(ones(1,length(P))+(Rfb.*P));
+0126 
+0127 figure(Lfig)
+0128 subplot(211), semilogx(w,20*log10(abs(L)),<span class="string">'m'</span>)
+0129 set(gca,<span class="string">'Position'</span>, [0.1514 0.4858 0.7536 0.3916],<span class="keyword">...</span>
+0130    <span class="string">'XColor'</span>,[0.4 0.4 0.4],<span class="string">'YColor'</span>,[0.4 0.4 0.4],<span class="keyword">...</span>
+0131    <span class="string">'FontSize'</span>,8,<span class="keyword">...</span>
+0132    <span class="string">'XTickLabel'</span>,[])
+0133 title(<span class="string">'Bode Diagram - Open loop function'</span>,<span class="keyword">...</span>
+0134    <span class="string">'Color'</span>,[0 0 0],<span class="string">'FontSize'</span>,8)
+0135 ylabel(<span class="string">'Magnitude (dB)'</span>,<span class="keyword">...</span>
+0136    <span class="string">'Color'</span>,[0 0 0],<span class="string">'FontSize'</span>,8)
+0137 legend(<span class="string">'STEP + ZN(OL)'</span>,<span class="string">'STEP + KT'</span>,<span class="string">'STEP + IMC'</span>,<span class="string">'RELAY + ZN(CL)'</span>,4)
+0138 subplot(212), semilogx(w,unwrap(angle(L))/pi*180,<span class="string">'m'</span>)
+0139 set(gca,<span class="string">'Position'</span>,[0.1514 0.1100 0.7536 0.3472],<span class="keyword">...</span>
+0140    <span class="string">'XColor'</span>,[0.4 0.4 0.4],<span class="string">'YColor'</span>,[0.4 0.4 0.4],<span class="keyword">...</span>
+0141    <span class="string">'FontSize'</span>,8)
+0142 ylabel(<span class="string">'Phase (deg)'</span>,<span class="keyword">...</span>
+0143    <span class="string">'Color'</span>,[0 0 0],<span class="string">'FontSize'</span>,8)
+0144 xlabel(<span class="string">'Frequency (rad/sec)'</span>,<span class="keyword">...</span>
+0145     <span class="string">'Color'</span>,[0 0 0],<span class="string">'FontSize'</span>,8)
+0146 
+0147 figure(Ffig)
+0148 subplot(211), semilogx(w,20*log10(abs(F)),<span class="string">'m'</span>)
+0149 set(gca,<span class="string">'Position'</span>, [0.1514 0.4858 0.7536 0.3916],<span class="keyword">...</span>
+0150    <span class="string">'XColor'</span>,[0.4 0.4 0.4],<span class="string">'YColor'</span>,[0.4 0.4 0.4],<span class="keyword">...</span>
+0151    <span class="string">'FontSize'</span>,8,<span class="keyword">...</span>
+0152    <span class="string">'XTickLabel'</span>,[])
+0153 title(<span class="string">'Bode Diagram - Complementary sensitivity function'</span>,<span class="keyword">...</span>
+0154    <span class="string">'Color'</span>,[0 0 0],<span class="string">'FontSize'</span>,8)
+0155 ylabel(<span class="string">'Magnitude (dB)'</span>,<span class="keyword">...</span>
+0156    <span class="string">'Color'</span>,[0 0 0],<span class="string">'FontSize'</span>,8)
+0157 legend(<span class="string">'STEP + ZN(OL)'</span>,<span class="string">'STEP + KT'</span>,<span class="string">'STEP + IMC'</span>,<span class="string">'RELAY + ZN(CL)'</span>,4)
+0158 subplot(212), semilogx(w,unwrap(angle(F))/pi*180,<span class="string">'m'</span>)
+0159 set(gca,<span class="string">'Position'</span>,[0.1514 0.1100 0.7536 0.3472],<span class="keyword">...</span>
+0160    <span class="string">'XColor'</span>,[0.4 0.4 0.4],<span class="string">'YColor'</span>,[0.4 0.4 0.4],<span class="keyword">...</span>
+0161    <span class="string">'FontSize'</span>,8)
+0162 ylabel(<span class="string">'Phase (deg)'</span>,<span class="keyword">...</span>
+0163    <span class="string">'Color'</span>,[0 0 0],<span class="string">'FontSize'</span>,8)
+0164 xlabel(<span class="string">'Frequency (rad/sec)'</span>,<span class="keyword">...</span>
+0165     <span class="string">'Color'</span>,[0 0 0],<span class="string">'FontSize'</span>,8)
+0166 
+0167 figure(Sfig)
+0168 subplot(211), semilogx(w,20*log10(abs(S)),<span class="string">'m'</span>)
+0169 set(gca,<span class="string">'Position'</span>, [0.1514 0.4858 0.7536 0.3916],<span class="keyword">...</span>
+0170    <span class="string">'XColor'</span>,[0.4 0.4 0.4],<span class="string">'YColor'</span>,[0.4 0.4 0.4],<span class="keyword">...</span>
+0171    <span class="string">'FontSize'</span>,8,<span class="keyword">...</span>
+0172    <span class="string">'XTickLabel'</span>,[])
+0173 title(<span class="string">'Bode Diagram - Sensitivity function'</span>,<span class="keyword">...</span>
+0174    <span class="string">'Color'</span>,[0 0 0],<span class="string">'FontSize'</span>,8)
+0175 ylabel(<span class="string">'Magnitude (dB)'</span>,<span class="keyword">...</span>
+0176    <span class="string">'Color'</span>,[0 0 0],<span class="string">'FontSize'</span>,8)
+0177 legend(<span class="string">'STEP + ZN(OL)'</span>,<span class="string">'STEP + KT'</span>,<span class="string">'STEP + IMC'</span>,<span class="string">'RELAY + ZN(CL)'</span>,4)
+0178 subplot(212), semilogx(w,unwrap(angle(S))/pi*180,<span class="string">'m'</span>)
+0179 set(gca,<span class="string">'Position'</span>,[0.1514 0.1100 0.7536 0.3472],<span class="keyword">...</span>
+0180    <span class="string">'XColor'</span>,[0.4 0.4 0.4],<span class="string">'YColor'</span>,[0.4 0.4 0.4],<span class="keyword">...</span>
+0181    <span class="string">'FontSize'</span>,8)
+0182 ylabel(<span class="string">'Phase (deg)'</span>,<span class="keyword">...</span>
+0183    <span class="string">'Color'</span>,[0 0 0],<span class="string">'FontSize'</span>,8)
+0184 xlabel(<span class="string">'Frequency (rad/sec)'</span>,<span class="keyword">...</span>
+0185    <span class="string">'Color'</span>,[0 0 0],<span class="string">'FontSize'</span>,8)</pre></div>
+<br>
+<p><table bgcolor="#ffe4b0" border=0 width="100%" cellpadding=0 cellspacing=0><tr valign=top><td align=left width=20><a href="autogui.html"><img src="b_prev.gif" alt="Previous page" border=0 align=bottom></a>&nbsp;</td><td align=left>&nbsp;autogui</td><td>&nbsp;</td><td align=right>butterdesign&nbsp;</td><td align=right width=20><a href="butterdesign.html"><img src="b_next.gif" alt="Next page" border=0 align=bottom></a></td></tr></table>
+<br>
+<address>Generated on Wed 17-Mar-2004 09:29:44 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

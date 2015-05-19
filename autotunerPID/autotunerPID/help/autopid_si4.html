@@ -1,0 +1,71 @@
+<html><head><title>Environment Panel :: Getting started with AutotunerPID Toolkit (AutotunerPID Toolkit)</title>
+<!-- $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $ -->
+
+<!-- DOCNAME: AutotunerPID Toolkit -->
+<!-- CHUNKNAME: Environment Panel -->
+<!-- CHAPNAME: Getting started with AutotunerPID Toolkit -->
+<!-- HEADSTUFF -->
+<link href="docstyle1.css" rel="stylesheet" type="text/css">
+</head>
+<body bgcolor=#ffffff>
+<!-- NAVBARTOP -->
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline bgcolor="#ffe4b0"><b>AutotunerPID Toolkit</b></td>
+<td valign=baseline bgcolor="#ffe4b0" align=right><a href="autopid_si3.html"><img src="b_prev.gif" alt="Previous page" border=0></a>&nbsp;&nbsp;&nbsp;<a href="autopid_exs.html"><img src="b_next.gif" alt="Next Page" border=0></a></td>
+</tr>
+</table>
+
+
+<a name="process_identification"></a><!-- H1 -->
+<p><font size=+2 color="#990000"><b>Environment Panel</b></font><br>
+<p>The <em>Environment Panel</em> is designed as a console from which controlling the simulation environment,
+	particularly the parameters which are not under direct control of the user, so that they cannot be included in the PID control
+ 	  panel. It also includes tools to perform a comparative analysis of the autotuning
+	methods in both time and frequency domain.</p>
+<table width="100%" border="0">
+	<tr>
+		<td align="center"><strong>Linux</strong></td>
+		<td align="center"><strong>Windows</strong></td>
+	</tr>
+  <tr><td align="center"><img src="images/EnvironmentPanelLinux.png"></td>
+    <td align="center"><img src="images/EnvironmentPanelWindows.png"></td>
+  </tr>
+</table>
+<p>In the following we will briefly summarize the characteristics of this
+	interface, which is mainly split in three areas.</p>
+
+<a name="operating_conditions_area"></a><!-- H2 --><a name="t1"></a>
+<p><font size=+1 color="#990000"><b>Operating Conditions</b></font><br>
+<p>It controls the simulation environment, through the following settings:</p>
+<ul>
+  <li><strong>Measurement Noise</strong>: a check-box menu that allows the insertion
+		of a measurement noise on the process value with user-defined variance;</li>
+  <li><strong>Load Disturbance</strong>: a check-box menu that allows the introduction
+		of a step diturbance on the process value with user-defined amplitude.</li>
+</ul>
+
+<a name="operating_conditions_area"></a><!-- H2 --><a name="t2"></a>
+<p><font size=+1 color="#990000"><b>Comparative Analysis</b></font><br>   
+<p>This area include analysis tools for both time and frequency domain. In particular, the time domain analysis perform
+ 	a comparison of the responses to a step on the set-point and on the load disturbance for a PID tuned with all the
+	available methods. The frequency domain analysis, instead, reports the open loop Bode diagram of the control system
+	together with the Bode diagram of the complementary sensitivity and the sensitivity function.</p>
+<p>See a sample of the analisys in the <a href="autopid_exs.html#t2">Example</a> section.</p>
+<p><ul><table border=1 cellspacing=0 cellpadding=5 width="90%"><tr>
+  <td bgcolor="#ffe4b0"><b>Note </b>&nbsp;&nbsp; The comparative analysis is available only when the model is NOT running and
+	for linear plants. Moreover the name of the blocks inside the Plant subsystem should not be changed since they are used as
+	references in the functions	performing this analysis</a></td>
+</tr></table></ul></p>
+		
+<a name="help_area"></a><!-- H2 --><a name="t3"></a>
+<p><font size=+1 color="#990000"><b>Help</b></font><br>
+<p>The Help button opens this help in the predefinite web browser window.</p>
+<br>
+
+<p><table bgcolor="#ffe4b0" border=0 width="100%" cellpadding=0 cellspacing=0><tr valign=top><td align=left width=20><a href="autopid_si3.html"><img src="b_prev.gif" alt="Previous page" border=0 align=bottom></a>&nbsp;</td><td align=left>&nbsp;PID Control Panel</td><td>&nbsp;</td><td align=right>Examples&nbsp;</td><td align=right width=20><a href="autopid_exs.html"><img src="b_next.gif" alt="Next page" border=0 align=bottom></a></td></tr></table>
+<br>
+
+<!-- Copyright 2004 W.Spinelli -->
+<!-- Last updated: Sat Feb 28 12:00:00 2004 -->
+</body>
+</html>

@@ -1,0 +1,1199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of autogui</title>
+  <meta name="keywords" content="autogui">
+  <meta name="description" content="AUTOGUI S-function for making a simple PID GUI">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="m2html.css">
+</head>
+<body>
+
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline bgcolor="#ffe4b0"><b>AutotunerPID Toolkit</b></td>
+<td valign=baseline bgcolor="#ffe4b0" align=right><a href="autopid_ref.html"><img src="b_prev.gif" alt="Previous page" border=0></a>&nbsp;&nbsp;&nbsp;<a href="bodePIDcompare.html"><img src="b_next.gif" alt="Next Page" border=0></a></td>
+</tr>
+</table>
+
+<h1>autogui</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="box"><strong>Matlab S-function for making a simple PID GUI.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="box"><strong>function [sys,x0,str,ts] = autogui(t,x,u,flag,RefBlock) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="fragment">
+  <pre class="comment">AUTOGUI S-function for making a simple PID GUI
+ 
+   When the model autotunerPID.mdl is run, this S-function create a panel
+   which closer resemble the layout of a typical real industrial autotuner
+   (at least in the control options). 
+   The upper part of the GUI is used to interact with the control system,
+   by changing the set-point value and by reading the value of the process
+   value and the control variable.  Moreover when used in MANUAL mode the
+   control variable is under the direct control of the user.  The
+   parameters area shows the parameter of the PID which can be changed 
+   online (except for the derivative weight c which is fixed to 0.
+   The last two areas allow to select the operating mode (AUTO/MANUAL) and
+   the autotuning method, split in the selection of the identification
+   method, the selection of the tuning method and the selection of the
+   regulator structure.
+
+   Everything started looking at PENDAN, an S-function for making pendulum
+   animation
+
+   Author:    William Spinelli (wspinell@elet.polimi.it)
+   Copyright  2004 W.Spinelli
+   $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $</pre>
+</div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<ul style="list-style-image:url(matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [sys,x0,str,ts] = mdlInitializeSizes(RefBlock)</a></li><li><a href="#_sub2" class="code">function sys = mdlUpdate(t,x,u)</a></li><li><a href="#_sub3" class="code">function LocalDeleteBlock</a></li><li><a href="#_sub4" class="code">function LocalDeleteFigure</a></li><li><a href="#_sub5" class="code">function LocalSliderSP</a></li><li><a href="#_sub6" class="code">function LocalSliderCV</a></li><li><a href="#_sub7" class="code">function LocalEditCV</a></li><li><a href="#_sub8" class="code">function LocalClose</a></li><li><a href="#_sub9" class="code">function LocalAutotune</a></li><li><a href="#_sub10" class="code">function LocalMan</a></li><li><a href="#_sub11" class="code">function LocalAuto</a></li><li><a href="#_sub12" class="code">function LocalEditK</a></li><li><a href="#_sub13" class="code">function LocalEditTi</a></li><li><a href="#_sub14" class="code">function LocalEditTd</a></li><li><a href="#_sub15" class="code">function LocalEditN</a></li><li><a href="#_sub16" class="code">function LocalEditb</a></li><li><a href="#_sub17" class="code">function LocalEditSP</a></li><li><a href="#_sub18" class="code">function LocalIdentification</a></li><li><a href="#_sub19" class="code">function LocalTuning</a></li><li><a href="#_sub20" class="code">function LocalEditParam</a></li><li><a href="#_sub21" class="code">function LocalStructure</a></li><li><a href="#_sub22" class="code">function LocalPIDSets(time,ud,u)</a></li><li><a href="#_sub23" class="code">function LocalPIDInit(RefBlock)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [sys,x0,str,ts] = autogui(t,x,u,flag,RefBlock)</a>
+0002 <span class="comment">%AUTOGUI S-function for making a simple PID GUI</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%   When the model autotunerPID.mdl is run, this S-function create a panel</span>
+0005 <span class="comment">%   which closer resemble the layout of a typical real industrial autotuner</span>
+0006 <span class="comment">%   (at least in the control options).</span>
+0007 <span class="comment">%   The upper part of the GUI is used to interact with the control system,</span>
+0008 <span class="comment">%   by changing the set-point value and by reading the value of the process</span>
+0009 <span class="comment">%   value and the control variable.  Moreover when used in MANUAL mode the</span>
+0010 <span class="comment">%   control variable is under the direct control of the user.  The</span>
+0011 <span class="comment">%   parameters area shows the parameter of the PID which can be changed</span>
+0012 <span class="comment">%   online (except for the derivative weight c which is fixed to 0.</span>
+0013 <span class="comment">%   The last two areas allow to select the operating mode (AUTO/MANUAL) and</span>
+0014 <span class="comment">%   the autotuning method, split in the selection of the identification</span>
+0015 <span class="comment">%   method, the selection of the tuning method and the selection of the</span>
+0016 <span class="comment">%   regulator structure.</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%   Everything started looking at PENDAN, an S-function for making pendulum</span>
+0019 <span class="comment">%   animation</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">%   Author:    William Spinelli (wspinell@elet.polimi.it)</span>
+0022 <span class="comment">%   Copyright  2004 W.Spinelli</span>
+0023 <span class="comment">%   $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $</span>
+0024 
+0025 <span class="comment">% Plots every major integration step, but has no states of its own</span>
+0026 <span class="keyword">switch</span> flag,
+0027    
+0028    <span class="comment">% Initialization</span>
+0029    <span class="keyword">case</span> 0,
+0030       [sys,x0,str,ts] = <a href="#_sub1" class="code" title="subfunction [sys,x0,str,ts] = mdlInitializeSizes(RefBlock)">mdlInitializeSizes</a>(RefBlock);
+0031       <span class="comment">% Update</span>
+0032    <span class="keyword">case</span> 2,
+0033       sys = <a href="#_sub2" class="code" title="subfunction sys = mdlUpdate(t,x,u)">mdlUpdate</a>(t,x,u);
+0034       <span class="comment">% Unused flags</span>
+0035    <span class="keyword">case</span> { 1, 3, 4, 9 },
+0036       sys = [];
+0037       <span class="comment">% DeleteBlock</span>
+0038    <span class="keyword">case</span> <span class="string">'DeleteBlock'</span>,
+0039       <a href="#_sub3" class="code" title="subfunction LocalDeleteBlock">LocalDeleteBlock</a>
+0040       <span class="comment">% DeleteFigure</span>
+0041    <span class="keyword">case</span> <span class="string">'DeleteFigure'</span>,
+0042       <a href="#_sub4" class="code" title="subfunction LocalDeleteFigure">LocalDeleteFigure</a>
+0043       <span class="comment">% SliderSP</span>
+0044    <span class="keyword">case</span> <span class="string">'SliderSP'</span>,
+0045       <a href="#_sub5" class="code" title="subfunction LocalSliderSP">LocalSliderSP</a>
+0046       <span class="comment">% EditSP</span>
+0047    <span class="keyword">case</span> <span class="string">'EditSP'</span>,
+0048       <a href="#_sub17" class="code" title="subfunction LocalEditSP">LocalEditSP</a>
+0049       <span class="comment">% SliderCV</span>
+0050    <span class="keyword">case</span> <span class="string">'SliderCV'</span>,
+0051       <a href="#_sub6" class="code" title="subfunction LocalSliderCV">LocalSliderCV</a>
+0052       <span class="comment">% EditCV</span>
+0053    <span class="keyword">case</span> <span class="string">'EditCV'</span>,
+0054       <a href="#_sub7" class="code" title="subfunction LocalEditCV">LocalEditCV</a>
+0055       <span class="comment">% Close</span>
+0056    <span class="keyword">case</span> <span class="string">'Close'</span>,
+0057       <a href="#_sub8" class="code" title="subfunction LocalClose">LocalClose</a>
+0058       <span class="comment">% Autotune</span>
+0059    <span class="keyword">case</span> <span class="string">'Autotune'</span>,
+0060       <a href="#_sub9" class="code" title="subfunction LocalAutotune">LocalAutotune</a>
+0061       <span class="comment">% Manual</span>
+0062    <span class="keyword">case</span> <span class="string">'Man'</span>,
+0063       <a href="#_sub10" class="code" title="subfunction LocalMan">LocalMan</a>
+0064       <span class="comment">% Auto</span>
+0065    <span class="keyword">case</span> <span class="string">'Auto'</span>,
+0066       <a href="#_sub11" class="code" title="subfunction LocalAuto">LocalAuto</a>
+0067       <span class="comment">% EditK</span>
+0068    <span class="keyword">case</span> <span class="string">'EditK'</span>,
+0069       <a href="#_sub12" class="code" title="subfunction LocalEditK">LocalEditK</a>
+0070       <span class="comment">% EditTi</span>
+0071    <span class="keyword">case</span> <span class="string">'EditTi'</span>,
+0072       <a href="#_sub13" class="code" title="subfunction LocalEditTi">LocalEditTi</a>
+0073       <span class="comment">% EditTd</span>
+0074    <span class="keyword">case</span> <span class="string">'EditTd'</span>,
+0075       <a href="#_sub14" class="code" title="subfunction LocalEditTd">LocalEditTd</a>
+0076       <span class="comment">% EditN</span>
+0077    <span class="keyword">case</span> <span class="string">'EditN'</span>,
+0078       <a href="#_sub15" class="code" title="subfunction LocalEditN">LocalEditN</a>
+0079       <span class="comment">% Editb</span>
+0080    <span class="keyword">case</span> <span class="string">'Editb'</span>,
+0081       <a href="#_sub16" class="code" title="subfunction LocalEditb">LocalEditb</a>
+0082       <span class="comment">% IdentMethod</span>
+0083    <span class="keyword">case</span> <span class="string">'Identification'</span>,
+0084       <a href="#_sub18" class="code" title="subfunction LocalIdentification">LocalIdentification</a>
+0085       <span class="comment">% TuningMethpd</span>
+0086    <span class="keyword">case</span> <span class="string">'Tuning'</span>,
+0087       <a href="#_sub19" class="code" title="subfunction LocalTuning">LocalTuning</a>
+0088       <span class="comment">% Structure</span>
+0089    <span class="keyword">case</span> <span class="string">'Structure'</span>,
+0090       <a href="#_sub21" class="code" title="subfunction LocalStructure">LocalStructure</a>
+0091       <span class="comment">% EditParam</span>
+0092    <span class="keyword">case</span> <span class="string">'EditParam'</span>,
+0093       <a href="#_sub20" class="code" title="subfunction LocalEditParam">LocalEditParam</a>
+0094       <span class="comment">% Unexpected flags</span>
+0095    <span class="keyword">otherwise</span>
+0096       error([<span class="string">'Unhandled flag = '</span>,num2str(flag)]);
+0097 <span class="keyword">end</span>
+0098 <span class="comment">% end autogui</span>
+0099 
+0100 <span class="comment">%=============================================================================</span>
+0101 <span class="comment">% mdlInitializeSizes</span>
+0102 <span class="comment">% Return the sizes, initial conditions, and sample times for the S-function.</span>
+0103 <span class="comment">%=============================================================================</span>
+0104 <a name="_sub1" href="#_subfunctions" class="code">function [sys,x0,str,ts] = mdlInitializeSizes(RefBlock)</a>
+0105 <span class="comment">% initialize parameters (setpoint)</span>
+0106 set_param(get_param([get_param(gcs,<span class="string">'Parent'</span>) <span class="string">'/'</span> RefBlock],<span class="string">'Handle'</span>),<span class="keyword">...</span>
+0107    <span class="string">'Value'</span>,<span class="string">'0'</span>);
+0108 
+0109 <span class="comment">% set up S-function</span>
+0110 sizes = simsizes;
+0111 
+0112 sizes.NumContStates  = 0;
+0113 sizes.NumDiscStates  = 0;
+0114 sizes.NumOutputs     = 0;
+0115 sizes.NumInputs      = 2;
+0116 sizes.DirFeedthrough = 1;
+0117 sizes.NumSampleTimes = 1;
+0118 
+0119 sys = simsizes(sizes);
+0120 
+0121 x0  = [];
+0122 str = [];
+0123 ts  = [0.1 0];
+0124 
+0125 <a href="#_sub23" class="code" title="subfunction LocalPIDInit(RefBlock)">LocalPIDInit</a>(RefBlock);
+0126 <span class="comment">% end mdlInitializeSizes</span>
+0127 
+0128 
+0129 <span class="comment">%=============================================================================</span>
+0130 <span class="comment">% mdlUpdate</span>
+0131 <span class="comment">% Update the PID GUI animation.</span>
+0132 <span class="comment">%=============================================================================</span>
+0133 <a name="_sub2" href="#_subfunctions" class="code">function sys = mdlUpdate(t,x,u)</a>
+0134 fig = get_param(gcbh,<span class="string">'UserData'</span>);
+0135 <span class="keyword">if</span> ishandle(fig),
+0136    <span class="keyword">if</span> strcmp(get(fig,<span class="string">'Visible'</span>),<span class="string">'on'</span>),
+0137       ud = get(fig,<span class="string">'UserData'</span>);
+0138       <a href="#_sub22" class="code" title="subfunction LocalPIDSets(time,ud,u)">LocalPIDSets</a>(t,ud,u);
+0139    <span class="keyword">end</span>
+0140 <span class="keyword">end</span>
+0141 sys = [];
+0142 <span class="comment">% end mdlUpdate</span>
+0143 
+0144 
+0145 <span class="comment">%=============================================================================</span>
+0146 <span class="comment">% LocalDeleteBlock</span>
+0147 <span class="comment">% The animation block is being deleted, delete the associated figure.</span>
+0148 <span class="comment">%=============================================================================</span>
+0149 <a name="_sub3" href="#_subfunctions" class="code">function LocalDeleteBlock</a>
+0150 fig = get_param(gcbh,<span class="string">'UserData'</span>);
+0151 <span class="keyword">if</span> ishandle(fig),
+0152    delete(fig);
+0153    set_param(gcbh,<span class="string">'UserData'</span>,-1)
+0154 <span class="keyword">end</span>
+0155 <span class="comment">% end LocalDeleteBlock</span>
+0156 
+0157 
+0158 <span class="comment">%=============================================================================</span>
+0159 <span class="comment">% LocalDeleteFigure</span>
+0160 <span class="comment">% The animation figure is being deleted, set the S-function UserData to -1.</span>
+0161 <span class="comment">%=============================================================================</span>
+0162 <a name="_sub4" href="#_subfunctions" class="code">function LocalDeleteFigure</a>
+0163 ud = get(gcbf,<span class="string">'UserData'</span>);
+0164 set_param(ud.Block,<span class="string">'UserData'</span>,-1);
+0165 <span class="comment">% end LocalDeleteFigure</span>
+0166 
+0167 
+0168 <span class="comment">%=============================================================================</span>
+0169 <span class="comment">% LocalSliderSP</span>
+0170 <span class="comment">% The callback function for the animation window slider SP control</span>
+0171 <span class="comment">%=============================================================================</span>
+0172 <a name="_sub5" href="#_subfunctions" class="code">function LocalSliderSP</a>
+0173 ud = get(gcbf,<span class="string">'UserData'</span>);
+0174 set_param(ud.RefBlock,<span class="string">'Value'</span>,num2str(get(gcbo,<span class="string">'Value'</span>)));
+0175 <span class="comment">% end LocalSliderSP</span>
+0176 
+0177 
+0178 <span class="comment">%=============================================================================</span>
+0179 <span class="comment">% LocalSliderCV</span>
+0180 <span class="comment">% The callback function for the animation window slider CV control</span>
+0181 <span class="comment">%=============================================================================</span>
+0182 <a name="_sub6" href="#_subfunctions" class="code">function LocalSliderCV</a>
+0183 <span class="keyword">global</span> CVVALUE
+0184 ud = get(gcbf,<span class="string">'UserData'</span>);
+0185 CVVALUE = get(gcbo,<span class="string">'Value'</span>);
+0186 set(ud.EditCV,<span class="string">'String'</span>,num2str(CVVALUE));
+0187 <span class="comment">% end LocalSliderCV</span>
+0188 
+0189 
+0190 <span class="comment">%=============================================================================</span>
+0191 <span class="comment">% LocalEditCV</span>
+0192 <span class="comment">% The callback function for the edit field of parameter CV</span>
+0193 <span class="comment">%=============================================================================</span>
+0194 <a name="_sub7" href="#_subfunctions" class="code">function LocalEditCV</a>
+0195 <span class="keyword">global</span> CVVALUE
+0196 ud = get(gcbf,<span class="string">'UserData'</span>);
+0197 CVVALUE = str2num(get(ud.EditCV,<span class="string">'String'</span>));
+0198 set(ud.SlideCV,<span class="string">'Value'</span>,CVVALUE);
+0199 <span class="comment">% end LocalEditCV</span>
+0200 
+0201 
+0202 <span class="comment">%=============================================================================</span>
+0203 <span class="comment">% LocalClose</span>
+0204 <span class="comment">% The callback function for the animation window close button.  Delete</span>
+0205 <span class="comment">% the animation figure window.</span>
+0206 <span class="comment">%=============================================================================</span>
+0207 <a name="_sub8" href="#_subfunctions" class="code">function LocalClose</a>
+0208 delete(gcbf)
+0209 <span class="comment">% end LocalClose</span>
+0210 
+0211 
+0212 <span class="comment">%=============================================================================</span>
+0213 <span class="comment">% LocalAutotune</span>
+0214 <span class="comment">% The callback function for the autotune button. Start autotuning</span>
+0215 <span class="comment">%=============================================================================</span>
+0216 <a name="_sub9" href="#_subfunctions" class="code">function LocalAutotune</a>
+0217 <span class="keyword">global</span> AUTOTUNE
+0218 <span class="keyword">global</span> INACTIVE
+0219 AUTOTUNE = 1;
+0220 INACTIVE = 1;
+0221 ud = get(gcbf,<span class="string">'UserData'</span>);
+0222 set(ud.SlideSP,<span class="string">'Enable'</span>,<span class="string">'inactive'</span>);
+0223 set(ud.EditSP,<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+0224 set(ud.SlideCV,<span class="string">'Enable'</span>,<span class="string">'inactive'</span>);
+0225 set(ud.EditCV,<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+0226 set(ud.Man,<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+0227 set(ud.Auto,<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+0228 set(ud.EditK,<span class="string">'Enable'</span>,<span class="string">'inactive'</span>);
+0229 set(ud.EditTi,<span class="string">'Enable'</span>,<span class="string">'inactive'</span>);
+0230 set(ud.EditTd,<span class="string">'Enable'</span>,<span class="string">'inactive'</span>);
+0231 set(ud.Editb,<span class="string">'Enable'</span>,<span class="string">'inactive'</span>);
+0232 set(ud.EditN,<span class="string">'Enable'</span>,<span class="string">'inactive'</span>);
+0233 set(ud.Ident,<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+0234 set(ud.Tuning,<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+0235 set(ud.TuningParam,<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+0236 set(ud.Structure,<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+0237 <span class="comment">% end LocalAutotune</span>
+0238 
+0239 
+0240 <span class="comment">%=============================================================================</span>
+0241 <span class="comment">% LocalMan</span>
+0242 <span class="comment">% The callback function for the manual selector button</span>
+0243 <span class="comment">%=============================================================================</span>
+0244 <a name="_sub10" href="#_subfunctions" class="code">function LocalMan</a>
+0245 <span class="keyword">global</span> AUTOMAN
+0246 ud = get(gcbf,<span class="string">'UserData'</span>);
+0247 set(ud.Auto,<span class="string">'Value'</span>,0);
+0248 set(ud.Man,<span class="string">'Value'</span>,1);
+0249 set(ud.EditCV,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0250 set(ud.SlideCV,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0251 AUTOMAN = 0;
+0252 <span class="comment">% end LocalMan</span>
+0253 
+0254 
+0255 <span class="comment">%=============================================================================</span>
+0256 <span class="comment">% LocalAuto</span>
+0257 <span class="comment">% The callback function for the automatic selector button</span>
+0258 <span class="comment">%=============================================================================</span>
+0259 <a name="_sub11" href="#_subfunctions" class="code">function LocalAuto</a>
+0260 <span class="keyword">global</span> AUTOMAN
+0261 ud = get(gcbf,<span class="string">'UserData'</span>);
+0262 set(ud.Man,<span class="string">'Value'</span>,0);
+0263 set(ud.Auto,<span class="string">'Value'</span>,1);
+0264 set(ud.EditCV,<span class="string">'Enable'</span>,<span class="string">'off'</span>);
+0265 set(ud.SlideCV,<span class="string">'Enable'</span>,<span class="string">'inactive'</span>);
+0266 AUTOMAN = 1;
+0267 <span class="comment">% end LocalAuto</span>
+0268 
+0269 
+0270 <span class="comment">%=============================================================================</span>
+0271 <span class="comment">% LocalEditK</span>
+0272 <span class="comment">% The callback function for the edit field of parameter K</span>
+0273 <span class="comment">%=============================================================================</span>
+0274 <a name="_sub12" href="#_subfunctions" class="code">function LocalEditK</a>
+0275 <span class="keyword">global</span> PIDPARAMETERS
+0276 ud = get(gcbf,<span class="string">'UserData'</span>);
+0277 PIDPARAMETERS = [str2num(get(ud.EditK,<span class="string">'String'</span>)) PIDPARAMETERS(2:5)];
+0278 <span class="comment">% end LocalEditK</span>
+0279 
+0280 
+0281 <span class="comment">%=============================================================================</span>
+0282 <span class="comment">% LocalEditTi</span>
+0283 <span class="comment">% The callback function for the edit field of parameter Ti</span>
+0284 <span class="comment">%=============================================================================</span>
+0285 <a name="_sub13" href="#_subfunctions" class="code">function LocalEditTi</a>
+0286 <span class="keyword">global</span> PIDPARAMETERS
+0287 ud = get(gcbf,<span class="string">'UserData'</span>);
+0288 PIDPARAMETERS = [PIDPARAMETERS(1)<span class="keyword">...</span>
+0289       str2num(get(ud.EditTi,<span class="string">'String'</span>)) PIDPARAMETERS(3:5)];
+0290 <span class="comment">% end LocalEditTi</span>
+0291 
+0292 
+0293 <span class="comment">%=============================================================================</span>
+0294 <span class="comment">% LocalEditTd</span>
+0295 <span class="comment">% The callback function for the edit field of parameter Td</span>
+0296 <span class="comment">%=============================================================================</span>
+0297 <a name="_sub14" href="#_subfunctions" class="code">function LocalEditTd</a>
+0298 <span class="keyword">global</span> PIDPARAMETERS
+0299 ud = get(gcbf,<span class="string">'UserData'</span>);
+0300 PIDPARAMETERS = [PIDPARAMETERS(1:2)<span class="keyword">...</span>
+0301       str2num(get(ud.EditTd,<span class="string">'String'</span>)) PIDPARAMETERS(4:5)];
+0302 <span class="comment">% end LocalEditTd</span>
+0303 
+0304 
+0305 <span class="comment">%=============================================================================</span>
+0306 <span class="comment">% LocalEditN</span>
+0307 <span class="comment">% The callback function for the edit field of parameter N</span>
+0308 <span class="comment">%=============================================================================</span>
+0309 <a name="_sub15" href="#_subfunctions" class="code">function LocalEditN</a>
+0310 <span class="keyword">global</span> PIDPARAMETERS
+0311 ud = get(gcbf,<span class="string">'UserData'</span>);
+0312 PIDPARAMETERS = [PIDPARAMETERS(1:3)<span class="keyword">...</span>
+0313       str2num(get(ud.EditN,<span class="string">'String'</span>)) PIDPARAMETERS(5)];
+0314 <span class="comment">% end LocalEditN</span>
+0315 
+0316 
+0317 <span class="comment">%=============================================================================</span>
+0318 <span class="comment">% LocalEditb</span>
+0319 <span class="comment">% The callback function for the edit field of parameter b</span>
+0320 <span class="comment">%=============================================================================</span>
+0321 <a name="_sub16" href="#_subfunctions" class="code">function LocalEditb</a>
+0322 <span class="keyword">global</span> PIDPARAMETERS
+0323 ud = get(gcbf,<span class="string">'UserData'</span>);
+0324 PIDPARAMETERS = [PIDPARAMETERS(1:4) str2num(get(ud.Editb,<span class="string">'String'</span>))];
+0325 <span class="comment">% end LocalEditb</span>
+0326 
+0327 
+0328 <span class="comment">%=============================================================================</span>
+0329 <span class="comment">% LocalEditSP</span>
+0330 <span class="comment">% The callback function for the edit field of parameter SP</span>
+0331 <span class="comment">%=============================================================================</span>
+0332 <a name="_sub17" href="#_subfunctions" class="code">function LocalEditSP</a>
+0333 ud = get(gcbf,<span class="string">'UserData'</span>);
+0334 set_param(ud.RefBlock,<span class="string">'Value'</span>,get(ud.EditSP,<span class="string">'String'</span>));
+0335 <span class="comment">% end LocalEditSP</span>
+0336 
+0337 
+0338 <span class="comment">%=============================================================================</span>
+0339 <span class="comment">% LocalIdentification</span>
+0340 <span class="comment">% The callback function for the selection of the identification method</span>
+0341 <span class="comment">%=============================================================================</span>
+0342 <a name="_sub18" href="#_subfunctions" class="code">function LocalIdentification</a>
+0343 <span class="keyword">global</span> TUNING_PARAM
+0344 <span class="keyword">global</span> IDENTIFICATION_METHOD
+0345 <span class="keyword">global</span> TUNING_METHOD
+0346 ud = get(gcbf,<span class="string">'UserData'</span>);
+0347 str = get(ud.Ident,<span class="string">'String'</span>);
+0348 IDENTIFICATION_METHOD = deblank(upper(str(get(ud.Ident,<span class="string">'Value'</span>),:)));
+0349 <span class="keyword">if</span> strcmp(IDENTIFICATION_METHOD,<span class="string">'STEP'</span>)
+0350    TUNING_PARAM = [];
+0351    TUNING_METHOD = <span class="string">'ZN (OL)'</span>;
+0352    set(ud.TunParText,<span class="string">'String'</span>,<span class="string">''</span>);
+0353    set(ud.TuningParam,<span class="string">'Style'</span>,<span class="string">'edit'</span>);
+0354    set(ud.TuningParam,<span class="string">'Visible'</span>,<span class="string">'off'</span>);
+0355    set(ud.Tuning,<span class="string">'Value'</span>,3);
+0356 <span class="keyword">elseif</span> strcmp(IDENTIFICATION_METHOD,<span class="string">'RELAY'</span>)
+0357    TUNING_PARAM = [];
+0358    TUNING_METHOD = <span class="string">'ZN (CL)'</span>;
+0359    set(ud.TunParText,<span class="string">'String'</span>,<span class="string">''</span>);
+0360    set(ud.TuningParam,<span class="string">'Style'</span>,<span class="string">'edit'</span>);
+0361    set(ud.TuningParam,<span class="string">'Visible'</span>,<span class="string">'off'</span>);
+0362    set(ud.Tuning,<span class="string">'Value'</span>,4);
+0363 <span class="keyword">end</span>
+0364 <span class="comment">% end LocalIdentification</span>
+0365 
+0366 
+0367 <span class="comment">%=============================================================================</span>
+0368 <span class="comment">% LocalTuning</span>
+0369 <span class="comment">% The callback function for the selection of the tuning method</span>
+0370 <span class="comment">%=============================================================================</span>
+0371 <a name="_sub19" href="#_subfunctions" class="code">function LocalTuning</a>
+0372 <span class="keyword">global</span> TUNING_PARAM
+0373 <span class="keyword">global</span> TUNING_METHOD
+0374 <span class="keyword">global</span> IDENTIFICATION_METHOD
+0375 ud = get(gcbf,<span class="string">'UserData'</span>);
+0376 str = get(ud.Tuning,<span class="string">'String'</span>);
+0377 TUNING_METHOD = deblank(upper(str(get(ud.Tuning,<span class="string">'Value'</span>),:)));
+0378 <span class="keyword">if</span> strcmp(TUNING_METHOD,<span class="string">'ZN (OL)'</span>)
+0379    set(ud.TunParText,<span class="string">'String'</span>,<span class="string">''</span>);
+0380    set(ud.TuningParam,<span class="string">'Style'</span>,<span class="string">'edit'</span>);
+0381    set(ud.TuningParam,<span class="string">'Visible'</span>,<span class="string">'off'</span>);
+0382    set(ud.TuningParam,<span class="string">'String'</span>,<span class="string">''</span>);
+0383    TUNING_PARAM = [];
+0384    IDENTIFICATION_METHOD = <span class="string">'STEP'</span>;
+0385    set(ud.Ident,<span class="string">'Value'</span>,1);
+0386 <span class="keyword">elseif</span> strcmp(TUNING_METHOD,<span class="string">'ZN (CL)'</span>)
+0387    set(ud.TunParText,<span class="string">'String'</span>,<span class="string">''</span>);
+0388    set(ud.TuningParam,<span class="string">'Style'</span>,<span class="string">'edit'</span>,<span class="keyword">...</span>
+0389       <span class="string">'Visible'</span>,<span class="string">'off'</span>,<span class="keyword">...</span>
+0390       <span class="string">'String'</span>,<span class="string">''</span>);
+0391    TUNING_PARAM = [];
+0392    IDENTIFICATION_METHOD = <span class="string">'RELAY'</span>;
+0393    set(ud.Ident,<span class="string">'Value'</span>,2);
+0394 <span class="keyword">elseif</span> strcmp(TUNING_METHOD,<span class="string">'KT'</span>)
+0395    set(ud.TunParText,<span class="string">'String'</span>,<span class="string">'Ms '</span>);
+0396    set(ud.TuningParam,<span class="string">'Style'</span>,<span class="string">'popupmenu'</span>,<span class="keyword">...</span>
+0397       <span class="string">'String'</span>,[<span class="string">'1.4'</span>;<span class="string">'2.0'</span>],<span class="keyword">...</span>
+0398       <span class="string">'Value'</span>,1,<span class="keyword">...</span>
+0399       <span class="string">'Visible'</span>,<span class="string">'on'</span>);
+0400    TUNING_PARAM = 1.4;
+0401    IDENTIFICATION_METHOD = <span class="string">'STEP'</span>;
+0402    set(ud.Ident,<span class="string">'Value'</span>,1);
+0403 <span class="keyword">elseif</span> strcmp(TUNING_METHOD,<span class="string">'IMC'</span>)
+0404    set(ud.TunParText,<span class="string">'String'</span>,<span class="string">'lambda '</span>);
+0405    set(ud.TuningParam,<span class="string">'Style'</span>,<span class="string">'edit'</span>,<span class="keyword">...</span>
+0406       <span class="string">'String'</span>,<span class="string">'1'</span>,<span class="keyword">...</span>
+0407       <span class="string">'Visible'</span>,<span class="string">'on'</span>);
+0408    TUNING_PARAM = 1;
+0409    IDENTIFICATION_METHOD = <span class="string">'STEP'</span>;
+0410    set(ud.Ident,<span class="string">'Value'</span>,1);
+0411 <span class="keyword">end</span>
+0412 <span class="comment">% end LocalTuning</span>
+0413 
+0414 
+0415 <span class="comment">%=============================================================================</span>
+0416 <span class="comment">% LocalEditParam</span>
+0417 <span class="comment">% The callback function for the edit field of the method of the parameter</span>
+0418 <span class="comment">%=============================================================================</span>
+0419 <a name="_sub20" href="#_subfunctions" class="code">function LocalEditParam</a>
+0420 <span class="keyword">global</span> TUNING_PARAM
+0421 <span class="keyword">global</span> TUNING_METHOD
+0422 ud = get(gcbf,<span class="string">'UserData'</span>);
+0423 <span class="keyword">if</span> strcmp(TUNING_METHOD,<span class="string">'KT'</span>)
+0424    <span class="keyword">if</span> get(ud.TuningParam,<span class="string">'Value'</span>)==1;
+0425       TUNING_PARAM = 1.4;
+0426    <span class="keyword">elseif</span> get(ud.TuningParam,<span class="string">'Value'</span>)==2;
+0427       TUNING_PARAM = 2.0;
+0428    <span class="keyword">end</span>
+0429 <span class="keyword">elseif</span> strcmp(TUNING_METHOD,<span class="string">'IMC'</span>)
+0430    TUNING_PARAM = str2num(get(ud.TuningParam,<span class="string">'String'</span>));
+0431 <span class="keyword">end</span>
+0432 <span class="comment">% end LocalEditParam</span>
+0433 
+0434 
+0435 <span class="comment">%=============================================================================</span>
+0436 <span class="comment">% LocalStructure</span>
+0437 <span class="comment">% The callback function for the selection of the regulator structure</span>
+0438 <span class="comment">%=============================================================================</span>
+0439 <a name="_sub21" href="#_subfunctions" class="code">function LocalStructure</a>
+0440 <span class="keyword">global</span> TUNING_STRUCTURE
+0441 ud = get(gcbf,<span class="string">'UserData'</span>);
+0442 str = get(ud.Structure,<span class="string">'String'</span>);
+0443 TUNING_STRUCTURE = deblank(upper(str(get(ud.Structure,<span class="string">'Value'</span>),:)));
+0444 <span class="comment">% end LocalStructure</span>
+0445 
+0446 
+0447 <span class="comment">%=============================================================================</span>
+0448 <span class="comment">% LocalPIDSets</span>
+0449 <span class="comment">% Local function to set the position of the graphics objects in the PID GUI</span>
+0450 <span class="comment">% animation window.</span>
+0451 <span class="comment">%=============================================================================</span>
+0452 <a name="_sub22" href="#_subfunctions" class="code">function LocalPIDSets(time,ud,u)</a>
+0453 <span class="keyword">global</span> AUTOMAN
+0454 <span class="keyword">global</span> AUTOTUNE
+0455 <span class="keyword">global</span> PIDPARAMETERS
+0456 <span class="keyword">global</span> INACTIVE
+0457 
+0458 PVValue = u(1);
+0459 SPValue = str2num(get_param(ud.RefBlock,<span class="string">'Value'</span>));
+0460 CVValue = u(2);
+0461 
+0462 <span class="comment">% time field</span>
+0463 set(ud.TimeField,<span class="keyword">...</span>
+0464    <span class="string">'String'</span>,num2str(time));
+0465 <span class="comment">% process value &amp; setpoint</span>
+0466 set(ud.PV,<span class="keyword">...</span>
+0467    <span class="string">'YData'</span>,[0 PVValue PVValue 0]);
+0468 set(ud.PVField,<span class="keyword">...</span>
+0469    <span class="string">'String'</span>,num2str(PVValue,<span class="string">'%1.4f'</span>));
+0470 set(ud.RefMark,<span class="keyword">...</span>
+0471    <span class="string">'YData'</span>,[SPValue+0.25 SPValue SPValue-0.25]);
+0472 set(ud.SlideSP,<span class="keyword">...</span>
+0473    <span class="string">'Value'</span>,SPValue);
+0474 set(ud.EditSP,<span class="keyword">...</span>
+0475    <span class="string">'String'</span>,num2str(SPValue,<span class="string">'%1.4f'</span>));
+0476 <span class="comment">% process value &amp; setpoint</span>
+0477 set(ud.CV,<span class="keyword">...</span>
+0478    <span class="string">'YData'</span>,[0 CVValue CVValue 0]);
+0479 <span class="keyword">if</span> ~AUTOTUNE
+0480    set(ud.SlideCV,<span class="keyword">...</span>
+0481       <span class="string">'Value'</span>,CVValue);
+0482    set(ud.EditCV,<span class="keyword">...</span>
+0483       <span class="string">'String'</span>,num2str(CVValue,<span class="string">'%1.4f'</span>)); 
+0484 <span class="keyword">end</span>
+0485 <span class="keyword">if</span> ~AUTOTUNE &amp; INACTIVE
+0486    <span class="comment">% Autotuning process completed (update parameters and set the GUI</span>
+0487    <span class="comment">% active)</span>
+0488    <span class="comment">% PID parameters</span>
+0489    set(ud.SlideSP,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0490    set(ud.EditSP,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0491    <span class="keyword">if</span> ~AUTOMAN
+0492       set(ud.SlideCV,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0493       set(ud.EditCV,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0494    <span class="keyword">end</span>
+0495    set(ud.Man,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0496    set(ud.Auto,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0497    set(ud.EditK,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0498    set(ud.EditTi,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0499    set(ud.EditTd,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0500    set(ud.Editb,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0501    set(ud.EditN,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0502    set(ud.Ident,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0503    set(ud.Tuning,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0504    set(ud.TuningParam,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0505    set(ud.Structure,<span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0506    set(ud.EditK,<span class="keyword">...</span>
+0507       <span class="string">'String'</span>,num2str(PIDPARAMETERS(1)));
+0508    set(ud.EditTi,<span class="keyword">...</span>
+0509       <span class="string">'String'</span>,num2str(PIDPARAMETERS(2)));
+0510    set(ud.EditTd,<span class="keyword">...</span>
+0511       <span class="string">'String'</span>,num2str(PIDPARAMETERS(3)));
+0512    set(ud.EditN,<span class="keyword">...</span>
+0513       <span class="string">'String'</span>,num2str(PIDPARAMETERS(4)));
+0514    set(ud.Editb,<span class="keyword">...</span>
+0515       <span class="string">'String'</span>,num2str(PIDPARAMETERS(5)));
+0516    INACTIVE = 0;
+0517 <span class="keyword">end</span>
+0518 
+0519 <span class="comment">% Force plot to be drawn</span>
+0520 pause(0), drawnow
+0521 <span class="comment">% end LocalPIDSets</span>
+0522 
+0523 
+0524 <span class="comment">%=============================================================================</span>
+0525 <span class="comment">% LocalPIDInit</span>
+0526 <span class="comment">% Local function to initialize the PID GUI animation.  If the animation</span>
+0527 <span class="comment">% window already exists, it is brought to the front.  Otherwise, a new</span>
+0528 <span class="comment">% figure window is created.</span>
+0529 <span class="comment">%=============================================================================</span>
+0530 <a name="_sub23" href="#_subfunctions" class="code">function LocalPIDInit(RefBlock)</a>
+0531 <span class="comment">% The name of the reference is derived from the name of the</span>
+0532 <span class="comment">% subsystem block that owns the PID animation S-function block.</span>
+0533 <span class="comment">% This subsystem is the current system and is assumed to be the same</span>
+0534 <span class="comment">% layer at which the reference block resides.</span>
+0535 sys = get_param(gcs,<span class="string">'Parent'</span>);
+0536 
+0537 <span class="keyword">global</span> AUTOTUNE
+0538 <span class="keyword">global</span> AUTOMAN
+0539 <span class="keyword">global</span> PIDPARAMETERS
+0540 <span class="keyword">global</span> IDENTIFICATION_METHOD
+0541 <span class="keyword">global</span> TUNING_METHOD
+0542 <span class="keyword">global</span> TUNING_PARAM
+0543 <span class="keyword">global</span> TUNING_STRUCTURE
+0544 <span class="keyword">global</span> INACTIVE
+0545 
+0546 INACTIVE = 1;
+0547 
+0548 IDENTIFICATION_METHOD = <span class="string">'STEP'</span>;
+0549 TUNING_METHOD = <span class="string">'KT'</span>;
+0550 TUNING_PARAM = 1.4;
+0551 TUNING_STRUCTURE  =<span class="string">'PID'</span>;
+0552 
+0553 AUTOTUNE = 0;
+0554 AUTOMAN  = 1;
+0555 
+0556 TimeClock = 0;
+0557 PVValue = 0;
+0558 SPValue = str2num(get_param([sys <span class="string">'/'</span> RefBlock],<span class="string">'Value'</span>));
+0559 CVValue = 0;
+0560 
+0561 <span class="comment">% The animation figure handle is stored in the PID block's UserData.</span>
+0562 <span class="comment">% If it exists, initialize all the fields</span>
+0563 Fig = get_param(gcbh,<span class="string">'UserData'</span>);
+0564 <span class="keyword">if</span> ishandle(Fig),
+0565    FigUD = get(Fig,<span class="string">'UserData'</span>);
+0566    
+0567    <span class="comment">% time field</span>
+0568    set(FigUD.TimeField,<span class="keyword">...</span>
+0569       <span class="string">'String'</span>,num2str(TimeClock));
+0570    <span class="comment">% process value &amp; set point</span>
+0571    set(FigUD.PV,<span class="keyword">...</span>
+0572       <span class="string">'YData'</span>,[0 PVValue PVValue 0]);
+0573    set(FigUD.PVField,<span class="keyword">...</span>
+0574       <span class="string">'String'</span>,num2str(PVValue));
+0575    set(FigUD.RefMark,<span class="keyword">...</span>
+0576       <span class="string">'YData'</span>,[SPValue+0.25 SPValue SPValue-0.25]);
+0577    set(FigUD.SlideSP,<span class="keyword">...</span>
+0578       <span class="string">'Value'</span>,0);
+0579    set(FigUD.EditSP,<span class="keyword">...</span>
+0580       <span class="string">'String'</span>,num2str(PVValue));
+0581    <span class="comment">% control variable</span>
+0582    set(FigUD.CV,<span class="keyword">...</span>
+0583       <span class="string">'YData'</span>,[0 CVValue CVValue 0]);
+0584    set(FigUD.EditCV,<span class="keyword">...</span>
+0585       <span class="string">'String'</span>,num2str(CVValue),<span class="keyword">...</span>
+0586       <span class="string">'Enable'</span>,<span class="string">'off'</span>);
+0587    set(FigUD.SlideCV,<span class="keyword">...</span>
+0588       <span class="string">'Value'</span>,CVValue,<span class="keyword">...</span>
+0589       <span class="string">'Enable'</span>,<span class="string">'inactive'</span>);
+0590    <span class="comment">% auto/man selector</span>
+0591    set(FigUD.Man,<span class="keyword">...</span>
+0592       <span class="string">'Value'</span>,0);
+0593    set(FigUD.Auto,<span class="keyword">...</span>
+0594       <span class="string">'Value'</span>,1);
+0595    <span class="comment">% PID parameters</span>
+0596    set(FigUD.EditK,<span class="keyword">...</span>
+0597       <span class="string">'String'</span>,num2str(PIDPARAMETERS(1)),<span class="keyword">...</span>
+0598       <span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0599    set(FigUD.EditTi,<span class="keyword">...</span>
+0600       <span class="string">'String'</span>,num2str(PIDPARAMETERS(2)),<span class="keyword">...</span>
+0601       <span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0602    set(FigUD.EditTd,<span class="keyword">...</span>
+0603       <span class="string">'String'</span>,num2str(PIDPARAMETERS(3)),<span class="keyword">...</span>
+0604       <span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0605    set(FigUD.EditN,<span class="keyword">...</span>
+0606       <span class="string">'String'</span>,num2str(PIDPARAMETERS(4)),<span class="keyword">...</span>
+0607       <span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0608    set(FigUD.Editb,<span class="keyword">...</span>
+0609       <span class="string">'String'</span>,num2str(PIDPARAMETERS(5)),<span class="keyword">...</span>
+0610       <span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0611    <span class="comment">% autotuning</span>
+0612    set(FigUD.Ident,<span class="keyword">...</span>
+0613       <span class="string">'Value'</span>,1,<span class="keyword">...</span>
+0614       <span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0615    set(FigUD.Tuning,<span class="keyword">...</span>
+0616       <span class="string">'Value'</span>,2,<span class="keyword">...</span>
+0617       <span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0618    set(FigUD.Structure,<span class="keyword">...</span>
+0619       <span class="string">'Value'</span>,1,<span class="keyword">...</span>
+0620       <span class="string">'Enable'</span>,<span class="string">'on'</span>);
+0621    set(FigUD.TunParText,<span class="keyword">...</span>
+0622       <span class="string">'String'</span>,<span class="string">'Ms '</span>);
+0623    set(FigUD.TuningParam,<span class="keyword">...</span>
+0624       <span class="string">'Style'</span>,<span class="string">'popupmenu'</span>,<span class="keyword">...</span>
+0625       <span class="string">'String'</span>,[<span class="string">'1.4'</span>;<span class="string">'2.0'</span>],<span class="keyword">...</span>
+0626       <span class="string">'Value'</span>,1,<span class="keyword">...</span>
+0627       <span class="string">'Enable'</span>,<span class="string">'on'</span>,<span class="keyword">...</span>
+0628       <span class="string">'Visible'</span>,<span class="string">'on'</span>);
+0629    
+0630    <span class="comment">% bring it to the front</span>
+0631    figure(Fig);
+0632    <span class="keyword">return</span>
+0633 <span class="keyword">end</span>
+0634 
+0635 <span class="comment">% the animation figure doesn't exist, create a new one and store its</span>
+0636 <span class="comment">% handle in the animation block's UserData</span>
+0637 FigureName = <span class="string">'PID Control Panel'</span>;
+0638 
+0639 <span class="comment">% Figure</span>
+0640 FigH = 610;                <span class="comment">% figure height</span>
+0641 FigW = 272;                <span class="comment">% figure width</span>
+0642 Fig = figure(<span class="keyword">...</span>
+0643    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0644    <span class="string">'Position'</span>,           [740 740-FigH FigW FigH],<span class="keyword">...</span>
+0645    <span class="string">'Name'</span>,               FigureName,<span class="keyword">...</span>
+0646    <span class="string">'NumberTitle'</span>,        <span class="string">'off'</span>,<span class="keyword">...</span>
+0647    <span class="string">'IntegerHandle'</span>,      <span class="string">'off'</span>,<span class="keyword">...</span>
+0648    <span class="string">'HandleVisibility'</span>,   <span class="string">'callback'</span>,<span class="keyword">...</span>
+0649    <span class="string">'Resize'</span>,             <span class="string">'off'</span>,<span class="keyword">...</span>
+0650    <span class="string">'MenuBar'</span>,            <span class="string">'none'</span>,<span class="keyword">...</span>
+0651    <span class="string">'DoubleBuffer'</span>,       <span class="string">'on'</span>,<span class="keyword">...</span>
+0652    <span class="string">'DeleteFcn'</span>,          <span class="string">'autogui([],[],[],''DeleteFigure'')'</span>,<span class="keyword">...</span>
+0653    <span class="string">'CloseRequestFcn'</span>,    <span class="string">'autogui([],[],[],''Close'');'</span>);
+0654 
+0655 <span class="comment">% Setpoint slider</span>
+0656 SlideControlSP = uicontrol(<span class="keyword">...</span>
+0657    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0658    <span class="string">'Style'</span>,              <span class="string">'slider'</span>,<span class="keyword">...</span>
+0659    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>, <span class="keyword">...</span>
+0660    <span class="string">'Position'</span>,           [25 FigH-325 22 300],<span class="keyword">...</span>
+0661    <span class="string">'Min'</span>,                -9,<span class="keyword">...</span>
+0662    <span class="string">'Max'</span>,                9,<span class="keyword">...</span>
+0663    <span class="string">'Value'</span>,              0,<span class="keyword">...</span>
+0664    <span class="string">'BackgroundColor'</span>,    [1 1 0],<span class="keyword">...</span>
+0665    <span class="string">'Callback'</span>,           <span class="string">'autogui([],[],[],''SliderSP'');'</span>);
+0666 uicontrol(<span class="keyword">...</span>
+0667    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0668    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0669    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0670    <span class="string">'Position'</span>,           [25 FigH-20 22 12], <span class="keyword">...</span>
+0671    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0672    <span class="string">'String'</span>,             <span class="string">'SP'</span>,<span class="keyword">...</span>
+0673    <span class="string">'Backgroundcolor'</span>,    [0.8 0.8 0.8],<span class="keyword">...</span>
+0674    <span class="string">'Foregroundcolor'</span>,    [1 1 0],<span class="keyword">...</span>
+0675    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>);
+0676 
+0677 <span class="comment">% Process value</span>
+0678 AxesPV = axes(<span class="keyword">...</span>
+0679    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0680    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0681    <span class="string">'Position'</span>,           [75 FigH-325 22 300],<span class="keyword">...</span>
+0682    <span class="string">'CLim'</span>,               [1 64], <span class="keyword">...</span>
+0683    <span class="string">'Xlim'</span>,               [-1 1],<span class="keyword">...</span>
+0684    <span class="string">'Ylim'</span>,               [-10 10],<span class="keyword">...</span>
+0685    <span class="string">'Visible'</span>,            <span class="string">'on'</span>,<span class="keyword">...</span>
+0686    <span class="string">'XTick'</span>,              [],<span class="keyword">...</span>
+0687    <span class="string">'XTickLabel'</span>,         [],<span class="keyword">...</span>
+0688    <span class="string">'FontSize'</span>,           8,<span class="keyword">...</span>
+0689    <span class="string">'Box'</span>,                <span class="string">'on'</span>);
+0690 uicontrol(<span class="keyword">...</span>
+0691    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0692    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0693    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0694    <span class="string">'Position'</span>,           [75 FigH-20 22 12], <span class="keyword">...</span>
+0695    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0696    <span class="string">'String'</span>,             <span class="string">'PV'</span>,<span class="keyword">...</span>
+0697    <span class="string">'Backgroundcolor'</span>,    [0.8 0.8 0.8],<span class="keyword">...</span>
+0698    <span class="string">'Foregroundcolor'</span>,    [1 0 1],<span class="keyword">...</span>
+0699    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>);
+0700 PV = patch(<span class="keyword">...</span>
+0701    <span class="string">'Parent'</span>,             AxesPV,<span class="keyword">...</span>
+0702    <span class="string">'XData'</span>,              [-1 -1 1 1],<span class="keyword">...</span>
+0703    <span class="string">'YData'</span>,              [0 PVValue PVValue 0],<span class="keyword">...</span>
+0704    <span class="string">'FaceColor'</span>,          [1 0 1]);
+0705 uicontrol(<span class="keyword">...</span>
+0706    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0707    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0708    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0709    <span class="string">'Position'</span>,           [106 FigH-175 50 14], <span class="keyword">...</span>
+0710    <span class="string">'Backgroundcolor'</span>,    [0.8 0.8 0.8],<span class="keyword">...</span>
+0711    <span class="string">'Foregroundcolor'</span>,    [1 0 1],<span class="keyword">...</span>
+0712    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0713    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0714    <span class="string">'String'</span>,             <span class="string">'PV'</span>);
+0715 PVField = uicontrol(<span class="keyword">...</span>
+0716    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0717    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0718    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0719    <span class="string">'Position'</span>,           [106 FigH-191 50 14], <span class="keyword">...</span>
+0720    <span class="string">'Backgroundcolor'</span>,    [1 1 1],<span class="keyword">...</span>
+0721    <span class="string">'Foregroundcolor'</span>,    [0 0 0],<span class="keyword">...</span>
+0722    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0723    <span class="string">'String'</span>,             num2str(PVValue));
+0724 RefMark = patch(<span class="keyword">...</span>
+0725    <span class="string">'Parent'</span>,             AxesPV,<span class="keyword">...</span>
+0726    <span class="string">'XData'</span>,              [-1 -0 -1],<span class="keyword">...</span>
+0727    <span class="string">'YData'</span>,              [SPValue+0.25 SPValue SPValue-0.25],<span class="keyword">...</span>
+0728    <span class="string">'FaceColor'</span>,          [1 1 0]);
+0729 uicontrol(<span class="keyword">...</span>
+0730    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0731    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0732    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0733    <span class="string">'Position'</span>,           [106 FigH-100 50 14], <span class="keyword">...</span>
+0734    <span class="string">'Backgroundcolor'</span>,    [0.8 0.8 0.8],<span class="keyword">...</span>
+0735    <span class="string">'Foregroundcolor'</span>,    [1 1 0],<span class="keyword">...</span>
+0736    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0737    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0738    <span class="string">'String'</span>,             <span class="string">'SP'</span>);
+0739 EditSP = uicontrol(<span class="keyword">...</span>
+0740    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0741    <span class="string">'Style'</span>,              <span class="string">'edit'</span>,<span class="keyword">...</span>
+0742    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0743    <span class="string">'Position'</span>,           [106 FigH-118 50 18], <span class="keyword">...</span>
+0744    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0745    <span class="string">'String'</span>,             num2str(SPValue),<span class="keyword">...</span>
+0746    <span class="string">'Foregroundcolor'</span>,    [0 0 0],<span class="keyword">...</span>
+0747    <span class="string">'Backgroundcolor'</span>,    [1 1 1],<span class="keyword">...</span>
+0748    <span class="string">'Callback'</span>,           <span class="string">'autogui([],[],[],''EditSP'');'</span>);
+0749 
+0750 <span class="comment">% Control variable</span>
+0751 AxesCV = axes(<span class="keyword">...</span>
+0752    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0753    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0754    <span class="string">'Position'</span>,           [175 FigH-325 22 300],<span class="keyword">...</span>
+0755    <span class="string">'CLim'</span>,               [1 64], <span class="keyword">...</span>
+0756    <span class="string">'Xlim'</span>,               [-1 1],<span class="keyword">...</span>
+0757    <span class="string">'Ylim'</span>,               [-10 10],<span class="keyword">...</span>
+0758    <span class="string">'Visible'</span>,            <span class="string">'on'</span>,<span class="keyword">...</span>
+0759    <span class="string">'XTick'</span>,              [],<span class="keyword">...</span>
+0760    <span class="string">'XTickLabel'</span>,         [],<span class="keyword">...</span>
+0761    <span class="string">'FontSize'</span>,           8,<span class="keyword">...</span>
+0762    <span class="string">'Box'</span>,                <span class="string">'on'</span>);
+0763 uicontrol(<span class="keyword">...</span>
+0764    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0765    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0766    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0767    <span class="string">'Position'</span>,           [175 FigH-20 22 12], <span class="keyword">...</span>
+0768    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0769    <span class="string">'String'</span>,             <span class="string">'CV'</span>,<span class="keyword">...</span>
+0770    <span class="string">'Backgroundcolor'</span>,    [0.8 0.8 0.8],<span class="keyword">...</span>
+0771    <span class="string">'Foregroundcolor'</span>,    [0 1 1],<span class="keyword">...</span>
+0772    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>);
+0773 CV = patch(<span class="keyword">...</span>
+0774    <span class="string">'Parent'</span>,             AxesCV,<span class="keyword">...</span>
+0775    <span class="string">'XData'</span>,              [-1 -1 1 1],<span class="keyword">...</span>
+0776    <span class="string">'YData'</span>,              [0 CVValue CVValue 0],<span class="keyword">...</span>
+0777    <span class="string">'FaceColor'</span>,          [0 1 1]);
+0778 
+0779 <span class="comment">% Control variable - Manual</span>
+0780 SlideControlCV = uicontrol(<span class="keyword">...</span>
+0781    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0782    <span class="string">'Style'</span>,              <span class="string">'slider'</span>,<span class="keyword">...</span>
+0783    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>, <span class="keyword">...</span>
+0784    <span class="string">'Position'</span>,           [225 FigH-325 22 300],<span class="keyword">...</span>
+0785    <span class="string">'Min'</span>,                -9,<span class="keyword">...</span>
+0786    <span class="string">'Max'</span>,                9,<span class="keyword">...</span>
+0787    <span class="string">'Value'</span>,              0,<span class="keyword">...</span>
+0788    <span class="string">'BackgroundColor'</span>,    [0 1 1],<span class="keyword">...</span>
+0789    <span class="string">'Callback'</span>,           <span class="string">'autogui([],[],[],''SliderCV'');'</span>,<span class="keyword">...</span>
+0790    <span class="string">'Enable'</span>,             <span class="string">'inactive'</span>);
+0791 uicontrol(<span class="keyword">...</span>
+0792    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0793    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0794    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0795    <span class="string">'Position'</span>,           [200 FigH-20 72 12], <span class="keyword">...</span>
+0796    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0797    <span class="string">'String'</span>,             <span class="string">'CV - MAN'</span>,<span class="keyword">...</span>
+0798    <span class="string">'Backgroundcolor'</span>,    [0.8 0.8 0.8],<span class="keyword">...</span>
+0799    <span class="string">'Foregroundcolor'</span>,    [0 1 1],<span class="keyword">...</span>
+0800    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>);
+0801 uicontrol(<span class="keyword">...</span>
+0802    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0803    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0804    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0805    <span class="string">'Position'</span>,           [106 FigH-250 50 14], <span class="keyword">...</span>
+0806    <span class="string">'Backgroundcolor'</span>,    [0.8 0.8 0.8],<span class="keyword">...</span>
+0807    <span class="string">'Foregroundcolor'</span>,    [0 1 1],<span class="keyword">...</span>
+0808    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0809    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0810    <span class="string">'String'</span>,             <span class="string">'CV'</span>);
+0811 EditCV = uicontrol(<span class="keyword">...</span>
+0812    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0813    <span class="string">'Style'</span>,              <span class="string">'edit'</span>,<span class="keyword">...</span>
+0814    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0815    <span class="string">'Position'</span>,           [106 FigH-268 50 18], <span class="keyword">...</span>
+0816    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0817    <span class="string">'String'</span>,             num2str(CVValue),<span class="keyword">...</span>
+0818    <span class="string">'Foregroundcolor'</span>,    [0 0 0],<span class="keyword">...</span>
+0819    <span class="string">'Backgroundcolor'</span>,    [1 1 1],<span class="keyword">...</span>
+0820    <span class="string">'Callback'</span>,           <span class="string">'autogui([],[],[],''EditCV'');'</span>,<span class="keyword">...</span>
+0821    <span class="string">'Enable'</span>,             <span class="string">'inactive'</span>);
+0822 
+0823 <span class="comment">% time field</span>
+0824 uicontrol(<span class="keyword">...</span>
+0825    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0826    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0827    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0828    <span class="string">'Position'</span>,           [100 FigH-348 36 12], <span class="keyword">...</span>
+0829    <span class="string">'HorizontalAlignment'</span>,<span class="string">'right'</span>,<span class="keyword">...</span>
+0830    <span class="string">'Backgroundcolor'</span>,    [0.8 0.8 0.8],<span class="keyword">...</span>
+0831    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0832    <span class="string">'String'</span>,             <span class="string">'Time: '</span>);
+0833 TimeField = uicontrol(<span class="keyword">...</span>
+0834    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0835    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0836    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>, <span class="keyword">...</span>
+0837    <span class="string">'Position'</span>,           [136 FigH-348 36 12],<span class="keyword">...</span>
+0838    <span class="string">'HorizontalAlignment'</span>,<span class="string">'left'</span>,<span class="keyword">...</span>
+0839    <span class="string">'Backgroundcolor'</span>,    [0.8 0.8 0.8],<span class="keyword">...</span>
+0840    <span class="string">'String'</span>,             num2str(TimeClock));
+0841 
+0842 <span class="comment">% PID parameters</span>
+0843 uicontrol(<span class="keyword">...</span>
+0844    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0845    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0846    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0847    <span class="string">'Position'</span>,           [12 FigH-371 140 14], <span class="keyword">...</span>
+0848    <span class="string">'HorizontalAlignment'</span>,<span class="string">'left'</span>,<span class="keyword">...</span>
+0849    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0850    <span class="string">'Backgroundcolor'</span>,    [0.8 0.8 0.8],<span class="keyword">...</span>
+0851    <span class="string">'String'</span>,             <span class="string">'Parameters'</span>);
+0852 uicontrol(<span class="keyword">...</span>
+0853    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0854    <span class="string">'Style'</span>,              <span class="string">'frame'</span>,<span class="keyword">...</span>
+0855    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0856    <span class="string">'Position'</span>,           [12 FigH-417 248 46]);
+0857 uicontrol(<span class="keyword">...</span>
+0858    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0859    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0860    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0861    <span class="string">'Position'</span>,           [16 FigH-393 20 14], <span class="keyword">...</span>
+0862    <span class="string">'HorizontalAlignment'</span>,<span class="string">'right'</span>,<span class="keyword">...</span>
+0863    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0864    <span class="string">'String'</span>,             <span class="string">'K '</span>);
+0865 EditK = uicontrol(<span class="keyword">...</span>
+0866    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0867    <span class="string">'Style'</span>,              <span class="string">'edit'</span>,<span class="keyword">...</span>
+0868    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0869    <span class="string">'Position'</span>,           [36 FigH-393 60 18], <span class="keyword">...</span>
+0870    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0871    <span class="string">'String'</span>,             <span class="string">''</span>,<span class="keyword">...</span>
+0872    <span class="string">'Backgroundcolor'</span>,    [1 1 1],<span class="keyword">...</span>
+0873    <span class="string">'Callback'</span>,           <span class="string">'autogui([],[],[],''EditK'');'</span>);
+0874 uicontrol(<span class="keyword">...</span>
+0875    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0876    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0877    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0878    <span class="string">'Position'</span>,           [96 FigH-393 20 14], <span class="keyword">...</span>
+0879    <span class="string">'HorizontalAlignment'</span>,<span class="string">'right'</span>,<span class="keyword">...</span>
+0880    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0881    <span class="string">'String'</span>,             <span class="string">'Ti '</span>);
+0882 EditTi = uicontrol(<span class="keyword">...</span>
+0883    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0884    <span class="string">'Style'</span>,              <span class="string">'edit'</span>,<span class="keyword">...</span>
+0885    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0886    <span class="string">'Position'</span>,           [116 FigH-393 60 18], <span class="keyword">...</span>
+0887    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0888    <span class="string">'String'</span>,             <span class="string">''</span>,<span class="keyword">...</span>
+0889    <span class="string">'Backgroundcolor'</span>,    [1 1 1],<span class="keyword">...</span>
+0890    <span class="string">'Callback'</span>,           <span class="string">'autogui([],[],[],''EditTi'');'</span>);
+0891 uicontrol(<span class="keyword">...</span>
+0892    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0893    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0894    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0895    <span class="string">'Position'</span>,           [176 FigH-393 20 14], <span class="keyword">...</span>
+0896    <span class="string">'HorizontalAlignment'</span>,<span class="string">'right'</span>,<span class="keyword">...</span>
+0897    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0898    <span class="string">'String'</span>,             <span class="string">'Td '</span>);
+0899 EditTd = uicontrol(<span class="keyword">...</span>
+0900    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0901    <span class="string">'Style'</span>,              <span class="string">'edit'</span>,<span class="keyword">...</span>
+0902    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0903    <span class="string">'Position'</span>,           [196 FigH-393 60 18], <span class="keyword">...</span>
+0904    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0905    <span class="string">'String'</span>,             <span class="string">''</span>,<span class="keyword">...</span>
+0906    <span class="string">'Backgroundcolor'</span>,    [1 1 1],<span class="keyword">...</span>
+0907    <span class="string">'Callback'</span>,           <span class="string">'autogui([],[],[],''EditTd'');'</span>);
+0908 uicontrol(<span class="keyword">...</span>
+0909    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0910    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0911    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0912    <span class="string">'Position'</span>,           [16 FigH-413 20 14], <span class="keyword">...</span>
+0913    <span class="string">'HorizontalAlignment'</span>,<span class="string">'right'</span>,<span class="keyword">...</span>
+0914    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0915    <span class="string">'String'</span>,             <span class="string">'N '</span>);
+0916 EditN = uicontrol(<span class="keyword">...</span>
+0917    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0918    <span class="string">'Style'</span>,              <span class="string">'edit'</span>,<span class="keyword">...</span>
+0919    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0920    <span class="string">'Position'</span>,           [36 FigH-413 60 18], <span class="keyword">...</span>
+0921    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0922    <span class="string">'String'</span>,             <span class="string">''</span>,<span class="keyword">...</span>
+0923    <span class="string">'Backgroundcolor'</span>,    [1 1 1],<span class="keyword">...</span>
+0924    <span class="string">'Callback'</span>,           <span class="string">'autogui([],[],[],''EditN'');'</span>);
+0925 uicontrol(<span class="keyword">...</span>
+0926    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0927    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0928    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0929    <span class="string">'Position'</span>,           [96 FigH-413 20 14], <span class="keyword">...</span>
+0930    <span class="string">'HorizontalAlignment'</span>,<span class="string">'right'</span>,<span class="keyword">...</span>
+0931    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0932    <span class="string">'String'</span>,             <span class="string">'b '</span>);
+0933 Editb = uicontrol(<span class="keyword">...</span>
+0934    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0935    <span class="string">'Style'</span>,              <span class="string">'edit'</span>,<span class="keyword">...</span>
+0936    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0937    <span class="string">'Position'</span>,           [116 FigH-413 60 18], <span class="keyword">...</span>
+0938    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0939    <span class="string">'String'</span>,             <span class="string">''</span>,<span class="keyword">...</span>
+0940    <span class="string">'Backgroundcolor'</span>,    [1 1 1],<span class="keyword">...</span>
+0941    <span class="string">'Callback'</span>,           <span class="string">'autogui([],[],[],''Editb'');'</span>);
+0942 uicontrol(<span class="keyword">...</span>
+0943    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0944    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0945    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0946    <span class="string">'Position'</span>,           [176 FigH-413 20 14], <span class="keyword">...</span>
+0947    <span class="string">'HorizontalAlignment'</span>,<span class="string">'right'</span>,<span class="keyword">...</span>
+0948    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0949    <span class="string">'String'</span>,             <span class="string">'c '</span>);
+0950 Editc = uicontrol(<span class="keyword">...</span>
+0951    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0952    <span class="string">'Style'</span>,              <span class="string">'edit'</span>,<span class="keyword">...</span>
+0953    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0954    <span class="string">'Position'</span>,           [196 FigH-413 60 18], <span class="keyword">...</span>
+0955    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+0956    <span class="string">'String'</span>,             <span class="string">'0'</span>,<span class="keyword">...</span>
+0957    <span class="string">'Backgroundcolor'</span>,    [1 1 1],<span class="keyword">...</span>
+0958    <span class="string">'Callback'</span>,           <span class="string">'autogui([],[],[],''Editc'');'</span>,<span class="keyword">...</span>
+0959    <span class="string">'Enable'</span>,             <span class="string">'off'</span>);
+0960 
+0961 <span class="comment">% auto/man selector</span>
+0962 uicontrol(<span class="keyword">...</span>
+0963    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0964    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0965    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0966    <span class="string">'Position'</span>,           [12 FigH-441 140 14], <span class="keyword">...</span>
+0967    <span class="string">'HorizontalAlignment'</span>,<span class="string">'left'</span>,<span class="keyword">...</span>
+0968    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0969    <span class="string">'Backgroundcolor'</span>,    [0.8 0.8 0.8],<span class="keyword">...</span>
+0970    <span class="string">'String'</span>,             <span class="string">'Operating Mode'</span>);
+0971 uicontrol(<span class="keyword">...</span>
+0972    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0973    <span class="string">'Style'</span>,              <span class="string">'frame'</span>,<span class="keyword">...</span>
+0974    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0975    <span class="string">'Position'</span>,           [12 FigH-467 248 24]);
+0976 Man = uicontrol(<span class="keyword">...</span>
+0977    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0978    <span class="string">'Style'</span>,              <span class="string">'radiobutton'</span>,<span class="keyword">...</span>
+0979    <span class="string">'Position'</span>,           [16 FigH-465 70 20],<span class="keyword">...</span>
+0980    <span class="string">'String'</span>,             <span class="string">'Manual'</span>, <span class="keyword">...</span>
+0981    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0982    <span class="string">'Value'</span>,              0,<span class="keyword">...</span>
+0983    <span class="string">'Callback'</span>,           <span class="string">'autogui([],[],[],''Man'');'</span>);
+0984 Auto = uicontrol(<span class="keyword">...</span>
+0985    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0986    <span class="string">'Style'</span>,              <span class="string">'radiobutton'</span>,<span class="keyword">...</span>
+0987    <span class="string">'Position'</span>,           [136 FigH-465 50 20],<span class="keyword">...</span>
+0988    <span class="string">'String'</span>,             <span class="string">'Auto'</span>, <span class="keyword">...</span>
+0989    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+0990    <span class="string">'Value'</span>,              1,<span class="keyword">...</span>
+0991    <span class="string">'Callback'</span>,           <span class="string">'autogui([],[],[],''Auto'');'</span>);
+0992 
+0993 <span class="comment">% autotuning</span>
+0994 uicontrol(<span class="keyword">...</span>
+0995    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+0996    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+0997    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+0998    <span class="string">'Position'</span>,           [12 FigH-491 140 14], <span class="keyword">...</span>
+0999    <span class="string">'HorizontalAlignment'</span>,<span class="string">'left'</span>,<span class="keyword">...</span>
+1000    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+1001    <span class="string">'Backgroundcolor'</span>,    [0.8 0.8 0.8],<span class="keyword">...</span>
+1002    <span class="string">'String'</span>,             <span class="string">'Autotuner'</span>);
+1003 uicontrol(<span class="keyword">...</span>
+1004    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+1005    <span class="string">'Style'</span>,              <span class="string">'frame'</span>,<span class="keyword">...</span>
+1006    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+1007    <span class="string">'Position'</span>,           [12 FigH-604 248 112]);
+1008 uicontrol(<span class="keyword">...</span>
+1009    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+1010    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+1011    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+1012    <span class="string">'Position'</span>,           [16 FigH-516 140 14], <span class="keyword">...</span>
+1013    <span class="string">'HorizontalAlignment'</span>,<span class="string">'left'</span>,<span class="keyword">...</span>
+1014    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+1015    <span class="string">'String'</span>,             <span class="string">'Identification method'</span>);
+1016 IdentMethod = uicontrol(<span class="keyword">...</span>
+1017    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+1018    <span class="string">'Style'</span>,              <span class="string">'popupmenu'</span>,<span class="keyword">...</span>
+1019    <span class="string">'Position'</span>,           [156 FigH-516 100 18],<span class="keyword">...</span>
+1020    <span class="string">'String'</span>,             [<span class="string">'step '</span>;<span class="string">'relay'</span>],<span class="keyword">...</span>
+1021    <span class="string">'Backgroundcolor'</span>,    [1 1 1],<span class="keyword">...</span>
+1022    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+1023    <span class="string">'Value'</span>,              1,<span class="keyword">...</span>
+1024    <span class="string">'Callback'</span>,           <span class="string">'autogui([],[],[],''Identification'');'</span>);
+1025 uicontrol(<span class="keyword">...</span>
+1026    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+1027    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+1028    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+1029    <span class="string">'Position'</span>,           [16 FigH-536 140 14], <span class="keyword">...</span>
+1030    <span class="string">'HorizontalAlignment'</span>,<span class="string">'left'</span>,<span class="keyword">...</span>
+1031    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+1032    <span class="string">'String'</span>,             <span class="string">'Tuning method'</span>);
+1033 TuningMethod = uicontrol(<span class="keyword">...</span>
+1034    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+1035    <span class="string">'Style'</span>,              <span class="string">'popupmenu'</span>,<span class="keyword">...</span>
+1036    <span class="string">'Position'</span>,           [156 FigH-536 100 18],<span class="keyword">...</span>
+1037    <span class="string">'String'</span>,             [<span class="string">'IMC    '</span>;<span class="string">'KT     '</span>;<span class="string">'ZN (OL)'</span>;<span class="string">'ZN (CL)'</span>], <span class="keyword">...</span>
+1038    <span class="string">'Backgroundcolor'</span>,    [1 1 1],<span class="keyword">...</span>
+1039    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+1040    <span class="string">'Value'</span>,              2,<span class="keyword">...</span>
+1041    <span class="string">'Callback'</span>,           <span class="string">'autogui([],[],[],''Tuning'');'</span>);
+1042 TuningParText = uicontrol(<span class="keyword">...</span>
+1043    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+1044    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+1045    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+1046    <span class="string">'Position'</span>,           [16 FigH-556 180 14], <span class="keyword">...</span>
+1047    <span class="string">'HorizontalAlignment'</span>,<span class="string">'right'</span>,<span class="keyword">...</span>
+1048    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+1049    <span class="string">'String'</span>,             <span class="string">'Ms '</span>);
+1050 TuningParam = uicontrol(<span class="keyword">...</span>
+1051    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+1052    <span class="string">'Style'</span>,              <span class="string">'popupmenu'</span>,<span class="keyword">...</span>
+1053    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+1054    <span class="string">'Position'</span>,           [196 FigH-556 60 18], <span class="keyword">...</span>
+1055    <span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>,<span class="keyword">...</span>
+1056    <span class="string">'String'</span>,             [<span class="string">'1.4'</span>;<span class="string">'2.0'</span>],<span class="keyword">...</span>
+1057    <span class="string">'Value'</span>,              1,<span class="keyword">...</span>
+1058    <span class="string">'Backgroundcolor'</span>,    [1 1 1],<span class="keyword">...</span>
+1059    <span class="string">'Callback'</span>,           <span class="string">'autogui([],[],[],''EditParam'');'</span>);
+1060 uicontrol(<span class="keyword">...</span>
+1061    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+1062    <span class="string">'Style'</span>,              <span class="string">'text'</span>,<span class="keyword">...</span>
+1063    <span class="string">'Units'</span>,              <span class="string">'pixel'</span>,<span class="keyword">...</span>
+1064    <span class="string">'Position'</span>,           [16 FigH-576 140 14], <span class="keyword">...</span>
+1065    <span class="string">'HorizontalAlignment'</span>,<span class="string">'left'</span>,<span class="keyword">...</span>
+1066    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+1067    <span class="string">'String'</span>,             <span class="string">'Structure'</span>);
+1068 RegStruct = uicontrol(<span class="keyword">...</span>
+1069    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+1070    <span class="string">'Style'</span>,              <span class="string">'popupmenu'</span>,<span class="keyword">...</span>
+1071    <span class="string">'Position'</span>,           [156 FigH-576 100 18],<span class="keyword">...</span>
+1072    <span class="string">'String'</span>,             [<span class="string">'PID '</span>;<span class="string">'PI  '</span>;<span class="string">'auto'</span>], <span class="keyword">...</span>
+1073    <span class="string">'Backgroundcolor'</span>,    [1 1 1],<span class="keyword">...</span>
+1074    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+1075    <span class="string">'Value'</span>,              1,<span class="keyword">...</span>
+1076    <span class="string">'Callback'</span>,           <span class="string">'autogui([],[],[],''Structure'');'</span>); 
+1077 uicontrol(<span class="keyword">...</span>
+1078    <span class="string">'Parent'</span>,             Fig,<span class="keyword">...</span>
+1079    <span class="string">'Style'</span>,              <span class="string">'pushbutton'</span>,<span class="keyword">...</span>
+1080    <span class="string">'Position'</span>,           [100 FigH-601 72 20],<span class="keyword">...</span>
+1081    <span class="string">'String'</span>,             <span class="string">'Autotune'</span>, <span class="keyword">...</span>
+1082    <span class="string">'Fontweight'</span>,         <span class="string">'bold'</span>,<span class="keyword">...</span>
+1083    <span class="string">'Callback'</span>,           <span class="string">'autogui([],[],[],''Autotune'');'</span>);
+1084 
+1085 
+1086 <span class="comment">% all the HG objects are created, store them into the Figure's UserData</span>
+1087 <span class="comment">% time field</span>
+1088 FigUD.TimeField    = TimeField;
+1089 <span class="comment">% process value &amp; setpoint</span>
+1090 FigUD.PV           = PV;
+1091 FigUD.SlideSP      = SlideControlSP;
+1092 FigUD.RefMark      = RefMark;
+1093 FigUD.EditSP       = EditSP;
+1094 FigUD.PVField      = PVField;
+1095 <span class="comment">% control variable</span>
+1096 FigUD.CV           = CV;
+1097 FigUD.SlideCV      = SlideControlCV;
+1098 FigUD.EditCV       = EditCV;
+1099 <span class="comment">% radiobox button</span>
+1100 FigUD.Man          = Man;
+1101 FigUD.Auto         = Auto;
+1102 <span class="comment">% edit field (PID parameters)</span>
+1103 FigUD.EditK        = EditK;
+1104 FigUD.EditTi       = EditTi;
+1105 FigUD.EditTd       = EditTd;
+1106 FigUD.EditN        = EditN;
+1107 FigUD.Editb        = Editb;
+1108 <span class="comment">% autotuning</span>
+1109 FigUD.Ident        = IdentMethod;
+1110 FigUD.Tuning       = TuningMethod;
+1111 FigUD.TunParText   = TuningParText;
+1112 FigUD.TuningParam  = TuningParam;
+1113 FigUD.Structure    = RegStruct;
+1114 <span class="comment">% Simulink Block Interaction</span>
+1115 FigUD.Block        = get_param(gcbh,<span class="string">'Handle'</span>);
+1116 FigUD.RefBlock     = get_param([sys <span class="string">'/'</span> RefBlock],<span class="string">'Handle'</span>);
+1117 
+1118 set(Fig,<span class="string">'UserData'</span>,FigUD);
+1119 
+1120 drawnow
+1121 
+1122 <span class="comment">% store the figure handle in the animation block's UserData</span>
+1123 set_param(gcbh,<span class="string">'UserData'</span>,Fig);
+1124 <span class="comment">% end LocalPIDInit</span></pre></div>
+<br>
+<p><table bgcolor="#ffe4b0" border=0 width="100%" cellpadding=0 cellspacing=0><tr valign=top><td align=left width=20><a href="autopid_ref.html"><img src="b_prev.gif" alt="Previous page" border=0 align=bottom></a>&nbsp;</td><td align=left>&nbsp;Function Reference</td><td>&nbsp;</td><td align=right>bodePIDcompare&nbsp;</td><td align=right width=20><a href="bodePIDcompare.html"><img src="b_next.gif" alt="Next page" border=0 align=bottom></a></td></tr></table>
+<br>
+
+<address>Generated on Wed 17-Mar-2004 09:29:44 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

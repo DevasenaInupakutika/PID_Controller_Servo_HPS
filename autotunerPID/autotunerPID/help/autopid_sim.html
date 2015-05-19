@@ -1,0 +1,155 @@
+<html><head><title>Getting started with AutotunerPID Toolkit (AutotunerPID Toolkit)</title>
+<!-- $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $ -->
+
+<!-- DOCNAME: AutotunerPID Toolkit -->
+<!-- CHUNKNAME: Layout of the Control System -->
+<!-- CHAPNAME: Getting started with AutotunerPID Toolkit -->
+<!-- HEADSTUFF -->
+<link rel=stylesheet href="docstyle1.css" type="text/css">
+</head>
+<body bgcolor=#ffffff>
+<!-- NAVBARTOP -->
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline bgcolor="#ffe4b0"><b>AutotunerPID Toolkit</b></td>
+<td valign=baseline bgcolor="#ffe4b0" align=right><a href="autopid_in4.html"><img src="b_prev.gif" alt="Previous page" border=0></a>&nbsp;&nbsp;&nbsp;<a href="autopid_si2.html"><img src="b_next.gif" alt="Next Page" border=0></a></td>
+</tr>
+</table>
+
+
+<a name="getting_started_with_the_autotunerPID_toolbox"></a><a name="12880"></a><h1>Getting Started with the AutotunerPID Toolkit</h1>
+<hr>
+
+<table width="100%" border="0" cellpadding="5">
+<tr><td valign="top" width=300><a href="autopid_sim.html#t1">Layout of the Control System</a></td>
+<td valign="top" width=600>Overview of the control system simulated by the AutotunerPID Toolkit</td>
+
+<tr><td valign="top" width=300><a href="autopid_si2.html">Setting up the Simulation</a><br></td>
+<td valign="top" width=600>Summary of the most important steps to set up the initial condition for the simulation<br></td>
+
+<tr><td valign="top" width=300><a href="autopid_si3.html">PID Control Panel</a><br></td>
+<td valign="top" width=600>Description of the interface to control the PID behavior<br></td>
+
+<tr><td valign="top" width=300 class=topiclist><a href="autopid_si4.html">Environment Panel</a><br></td>
+<td valign="top" width=600>Description of the interface to control the environment behavior<br></td>
+
+</table> 
+
+
+<a name="layout_control_system"></a><a name="t1"></a><!-- H1 -->
+<p><font size=+2 color="#990000"><b>Layout of the Control System</b></font><br>
+<p>The AutotunerPID Toolkit simulates a single SISO control loop, which includes a PID with autotuner,
+ 	the plant to be controlled, a lowpass filter and some auxiliary blocks to manage the simulation (for
+	example change the set-point or perform the autotuning or include a measurement noise).</p>
+<p>The main component of the Toolkit is the Simulink file <font face="Courier New, Courier, mono">autotunerPID.mdl</font></p>
+<table width="100%" border="0">
+  <tr><td align="center"><img src="images/SimulinkSchema.png"></td></tr>
+</table>
+<p>The following sections describe the role of each blocks in the model. You can view the
+ 	general AutotunerPID Function reference in <a href="autopid_ref.html">Function Reference</a>.</p>
+<p><ul><table border=1 cellspacing=0 cellpadding=5 width="90%"><tr>
+  <td bgcolor="#ffe4b0"><b>Note </b>&nbsp;&nbsp; For more information about PID Autotuning, see <a href="autopid_int.html">Introduction
+	to PID Autotuning</a>.</td>
+</tr></table></ul></p>
+
+<br>
+<p><a name="PID_with_Autotuning"></a><!-- H2 --><a name="t2"></a></p>
+<p><font size=+1 color="#990000"><b>PID with Autotuning</b></font><br>
+<p>The regulator is a subsystem composed by two S-functions: <font face="Courier New, Courier, mono">pid_isatd.m</font>
+ 	which implements a discrete time ISA-PID and <font face="Courier New, Courier, mono">pid_autotuner.m</font> which
+	takes in charge the autotuning process.</p>
+<table width="100%" border="0">
+  <tr><td align="center"><img src="images/PIDwithAutotuner.png"></td></tr>
+</table>
+<p><font color="#990000"><b>Discrete time ISA-PID (<font face="Courier New, Courier, mono"><a href="pid_isatd.html">pid_isatd.m</a></font>)</b></font>
+<p>The discrete time ISA-PID includes the filter on the derivative action, the set-point weight (but not the weight
+ 	of the derivative action which is fixed to <font face="Courier New, Courier, mono">c=0</font>). Moreover the PID
+	implements antiwindup on lower and higher saturation limits of the actuator and bumpless auto-manual switch. The
+	structure of this &quot;industrial PID&quot; is more complex than the structure of the &quot;scholastic PID&quot; and it closely
+	resemble the functioning of regulators used in practice.</p>
+<br>
+<p><font color="#990000"><b>Autotuner Supervisor (<font face="Courier New, Courier, mono"><a href="pid_autotuner.html">pid_autotuner.m</a></font>)</b></font>
+<p>The autotuner supervisor, instead, rules out the autotuning process mainly
+  performing the identification of a FOPDT process model (<font face="Courier New, Courier, mono"><a href="idareas.html">idareas.m</a></font>)
+	or a set of characteristics (<font face="Courier New, Courier, mono"><a href="pid_autotuner.html">pid_autotuner.m</a></font>)
+	and the synthesis of the new parameters with the methods described (<font face="Courier New, Courier, mono"><a href="pid_tuning.html">pid_tuning.m</a></font>).
+	Moreover it is possible to constrain the structure of the
+	regulator to be a PI or a PID, or the structure can be automatically selected
+  by the supervisor (<font face="Courier New, Courier, mono"><a href="pid_structure.html">pid_structure.m</a></font>).
+  In particular, the identification experiment includes both step response and
+  relay response with tunable hysteresis and amplitude.</p>
+	
+<br>
+<p><a name="Plant"></a><!-- H2 --><a name="t3"></a></p>
+<p><font size=+1 color="#990000"><b>Plant</b></font><br>
+<p>The plant is a subsystem which model the process that must be controlled</p>
+<table width="100%" border="0">
+  <tr><td align="center"><img src="images/Plant.png"></td></tr>
+</table>
+<p>The structure of the plant has been left open by purpose. The user can thus include his own plant in the
+simulator since there is no constrain on it: the plant can be linear or nonlinear, continuous or discrete time and so
+on. However, the <a href="autopid_si4.html#t2">comparative analysis</a> of a step responses and Bode diagrams
+is available only for linear plants (for obvious reasons).</p>
+<p><ul><table border=1 cellspacing=0 cellpadding=5 width="90%"><tr>
+  <td bgcolor="#ffe4b0"><b>Note </b>&nbsp;&nbsp; The comparative analysis is available only when the model is NOT running and
+	for linear plants. Moreover the name of the blocks inside the Plant subsystem should not be changed since they are used as
+	references in the functions	performing this analysis</a></td>
+</tr></table></ul></p>
+
+<br>
+<p><a name="PID_Panel"></a><!-- H2 --><a name="t4"></a></p>
+<p><font size=+1 color="#990000"><b>PID Control Panel</b></font><br>
+<p>The <a href="autopid_si3.html">PID Control Panel</a> is implemented through a masked S-function 
+	(<font face="Courier New, Courier, mono"><a href="autogui.html">autogui.m</a></font>),
+ 	which uses the graphical primitives of the MATLAB environment to create a GUI which has a close feeling to that of a real PID.
+	The aim of this interface is to provide all the inputs and outputs typical of a real industrial PID.</p>
+
+<br>
+<p><a name="Env_Panel"></a><!-- H2 --><a name="t5"></a></p>
+<p><font size=+1 color="#990000"><b>Environment Panel</b></font><br>
+<p>The <a href="autopid_si4.html">Environment Panel</a> is implemented through a masked S-function
+	(<font face="Courier New, Courier, mono"><a href="envgui.html">envgui.m</a></font>).
+ 	It controls the parameter of the simulation which are not under direct control of the user, so that they cannot be
+	included in the PID control panel. For example a measurement noise or a step on the load disturbance can be included.
+<p>Moreover, through the environment control panel, a <a href="autopid_si4.html#t2">comparative analysis</a>
+	of all the autotuning methods can be performed, both in time domain and in frequency domain.</p>
+
+<br>
+<p><a name="Butt_Filt"></a><!-- H2 --><a name="t6"></a></p>
+<p><font size=+1 color="#990000"><b>Butterworth Analog Filter</b></font><br>
+<p>The lowpass Butterworth analog filter in the control loop is used as an antialiasing
+	filter and also to reduce the effects of the measurement noise. The order of the filter and the bandwidth can be set by
+	the user (<font face="Courier New, Courier, mono"><a href="butterdesign.html">butterdesign.m</a></font>).</p>
+	
+<br>
+<p><a name="Service_Blocks"></a><!-- H2 --><a name="t7"></a></p>
+<p><font size=+1 color="#990000"><b>Service Blocks</b></font><br>
+<p>The remaining blocks are inserted just to have a fully functional environment.</p>
+<ul>
+  <li><strong>set-point</strong>: the desired value of the process value;</li>
+ 	<li><strong>LoadDisturbance</strong>: a value added to the output of the plant;</li>
+  <li><strong>MeasurementNoise</strong>: a white gaussian noise added to the measure of the process value;</li>
+  <li><strong>SP-PV-CV</strong>: a scope block which displays the value of the <em>Set Point</em> SP (yellow),
+		<em>Process Value</em> PV (magenta) and <em>Control Variable</em> CV (cyan).</li>	
+</ul>
+<p>
+<ul><table border=1 cellspacing=0 cellpadding=5 width="90%"><tr>
+  <td bgcolor="#ffe4b0"><b>Note </b>&nbsp;&nbsp; The GUIs control the value of the <em>set-point</em>, <em>load
+      disturbance</em> and
+      <em>measurement noise</em> through a reference to the name of the corresponding blocks. It is suggested
+      that you DON'T change the name of this block. If you do this, you must also change the references
+      in the masks of the block &quot;PID Control Panel&quot; and
+			&quot;Environment Panel&quot;</a></td>
+</tr></table></ul>
+</p>
+
+<br>
+
+<p><table bgcolor="#ffe4b0" border=0 width="100%" cellpadding=0 cellspacing=0><tr valign=top><td align=left width=20><a href="autopid_in4.html"><img src="b_prev.gif" alt="Previous page" border=0 align=bottom></a>&nbsp;</td><td align=left>&nbsp;Synthesis methods</td><td>&nbsp;</td><td align=right>Setting up the Simulation&nbsp;</td><td align=right width=20><a href="autopid_si2.html"><img src="b_next.gif" alt="Next page" border=0 align=bottom></a></td></tr></table>
+<br>
+
+<!-- Copyright 2003 The MathWorks, Inc. -->
+<!-- Last updated: Fri Jul 18 13:53:35 2003 -->
+</body>
+</html>
+
+

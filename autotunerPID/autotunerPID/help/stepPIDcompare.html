@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of stepPIDcompare</title>
+  <meta name="keywords" content="stepPIDcompare">
+  <meta name="description" content="STEPPIDCOMPARE  Comparison of step response on setpoint and load">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="m2html.css">
+</head>
+<body>
+
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline bgcolor="#ffe4b0"><b>AutotunerPID Toolkit</b></td>
+<td valign=baseline bgcolor="#ffe4b0" align=right><a href="pid_tuning.html"><img src="b_prev.gif" alt="Previous page" border=0></a></td>
+</tr>
+</table>
+
+<h1>stepPIDcompare</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="box"><strong>STEPPIDCOMPARE  Comparison of step response on setpoint and load disturbance.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="box"><strong>function stepPIDcompare(num,den,tau) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="fragment"><pre class="comment">STEPPIDCOMPARE  Comparison of step response on setpoint and load
+   disturbance with different autotuning methods
+   
+   The function is typically called through the GUI in AutotunerPID.mdl
+   and provides a graphical comparison of four different autotuning
+   methods (STEP/ZN(OL), STEP/KT, STEP/IMC, RELAY/ZN(CL)) in time domain.
+   The response to a step on the setpoint at time t = 0 and the response
+   to a step at 2/3 of the final time are simulated.
+   By default the parameter Ms is set to 2 in KT methods, while the
+   parameter lambda is set 1/5 of the settling time of the plant.
+   
+   STEPPIDCOMPARE(NUM,DEN,TAU) performs the comparative analysis directly
+   considering the plant described by the transfer function
+              NUM(s)
+      P(s) = -------- * exp(-TAU*s)
+              DEN(s)
+
+   See also BODEPID</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(matlabicon.gif)">
+<li><a href="idareas.html" class="code" title="function model = idareas(y,As,Ts)">idareas</a>	IDAREAS Identification of a FOPDT model using the method of the</li><li><a href="pid_tuning.html" class="code" title="function [K,Ti,Td,N,b] = pid_tuning(model,method,param,regStruct,As)">pid_tuning</a>	PID_TUNING Tune the parameters of a ISA-PID regulator with some</li></ul>
+This function is called by:
+<ul style="list-style-image:url(matlabicon.gif)">
+<li><a href="envgui.html" class="code" title="function [sys,x0,str,ts] = envgui(t,x,u,flag,NoiseBlock,LoadDistBlock)">envgui</a>	ENVGUI S-function for making a simple PID GUI</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function stepPIDcompare(num,den,tau)</a>
+0002 <span class="comment">%STEPPIDCOMPARE  Comparison of step response on setpoint and load</span>
+0003 <span class="comment">%   disturbance with different autotuning methods</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%   The function is typically called through the GUI in AutotunerPID.mdl</span>
+0006 <span class="comment">%   and provides a graphical comparison of four different autotuning</span>
+0007 <span class="comment">%   methods (STEP/ZN(OL), STEP/KT, STEP/IMC, RELAY/ZN(CL)) in time domain.</span>
+0008 <span class="comment">%   The response to a step on the setpoint at time t = 0 and the response</span>
+0009 <span class="comment">%   to a step at 2/3 of the final time are simulated.</span>
+0010 <span class="comment">%   By default the parameter Ms is set to 2 in KT methods, while the</span>
+0011 <span class="comment">%   parameter lambda is set 1/5 of the settling time of the plant.</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%   STEPPIDCOMPARE(NUM,DEN,TAU) performs the comparative analysis directly</span>
+0014 <span class="comment">%   considering the plant described by the transfer function</span>
+0015 <span class="comment">%              NUM(s)</span>
+0016 <span class="comment">%      P(s) = -------- * exp(-TAU*s)</span>
+0017 <span class="comment">%              DEN(s)</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%   See also BODEPID</span>
+0020 
+0021 <span class="comment">%   Author:    William Spinelli (wspinell@elet.polimi.it)</span>
+0022 <span class="comment">%   Copyright  2004 W.Spinelli</span>
+0023 <span class="comment">%   $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $</span>
+0024 
+0025 <span class="keyword">global</span> PIDPARAMETERS
+0026 
+0027 <span class="comment">% compute step response</span>
+0028 P = tf(num,den,<span class="string">'IODelay'</span>,tau);
+0029 [y,t] = step(P);
+0030 Ts = min(real(abs(pole(P))))/50;
+0031 [y,t] = step(P,0:Ts:t(end));
+0032 Tf = t(end);
+0033 
+0034 <span class="comment">% identify a FOPDT model</span>
+0035 modelFOPDT = <a href="idareas.html" class="code" title="function model = idareas(y,As,Ts)">idareas</a>(y,1,Ts);
+0036 
+0037 <span class="comment">% identify the point of the frequency response with omega_n = -pi</span>
+0038 [Gm,Pm,Wcg,Wcp] = margin(P);
+0039 modelPI.A = 2/Gm;
+0040 modelPI.T = 2*pi/Wcg;
+0041 
+0042 <span class="comment">% Set up the simulation environment</span>
+0043 load_system(<span class="string">'steppidsupport'</span>)
+0044 simhandle = <span class="string">'steppidsupport'</span>;
+0045 set_param([simhandle <span class="string">'/Plant'</span>],<span class="string">'Numerator'</span>,[<span class="string">'['</span> num2str(num) <span class="string">']'</span>]);
+0046 set_param([simhandle <span class="string">'/Plant'</span>],<span class="string">'Denominator'</span>,[<span class="string">'['</span> num2str(den) <span class="string">']'</span>]);
+0047 set_param([simhandle <span class="string">'/PlantDelay'</span>],<span class="string">'DelayTime'</span>,num2str(tau));
+0048 set_param([simhandle <span class="string">'/spWorkspace'</span>],<span class="string">'SampleTime'</span>,num2str(Ts));
+0049 set_param([simhandle <span class="string">'/cvWorkspace'</span>],<span class="string">'SampleTime'</span>,num2str(Ts));
+0050 set_param([simhandle <span class="string">'/pvWorkspace'</span>],<span class="string">'SampleTime'</span>,num2str(Ts));
+0051 set_param([simhandle <span class="string">'/toutWorkspace'</span>],<span class="string">'SampleTime'</span>,num2str(Ts));
+0052 set_param([simhandle <span class="string">'/ISA PID'</span>],<span class="string">'Ts'</span>,num2str(Ts));
+0053 set_param(simhandle,<span class="string">'StopTime'</span>,num2str(2*Tf));
+0054 
+0055 set_param([simhandle <span class="string">'/SetPoint'</span>],<span class="string">'Time'</span>,num2str(0));
+0056 set_param([simhandle <span class="string">'/SetPoint'</span>],<span class="string">'After'</span>,num2str(1));
+0057 set_param([simhandle <span class="string">'/Disturbance'</span>],<span class="string">'Time'</span>,num2str(4/3*Tf));
+0058 set_param([simhandle <span class="string">'/Disturbance'</span>],<span class="string">'After'</span>,num2str(0.1));
+0059 
+0060 figure(<span class="keyword">...</span>
+0061    <span class="string">'Name'</span>,               <span class="string">'Step response'</span>,<span class="keyword">...</span>
+0062    <span class="string">'NumberTitle'</span>,        <span class="string">'off'</span>);
+0063 
+0064 <span class="comment">% simulation of the step response with different autotuner</span>
+0065 <span class="comment">% Ziegler &amp; Nichols with Step identification</span>
+0066 [K,Ti,Td,N,b] = <a href="pid_tuning.html" class="code" title="function [K,Ti,Td,N,b] = pid_tuning(model,method,param,regStruct,As)">pid_tuning</a>(modelFOPDT,<span class="string">'ZN (OL)'</span>,[],<span class="string">'PID'</span>);
+0067 PIDPARAMETERS = [K,Ti,Td,N,b];
+0068 sim(<span class="string">'steppidsupport'</span>);
+0069 subplot(211)
+0070 plot(tout,pvVec,<span class="string">'b'</span>)
+0071 set(gca,<span class="string">'XColor'</span>,[0.4 0.4 0.4],<span class="string">'YColor'</span>,[0.4 0.4 0.4],<span class="keyword">...</span>
+0072    <span class="string">'FontSize'</span>,8)
+0073 hold on
+0074 subplot(212)
+0075 plot(tout,cvVec,<span class="string">'b'</span>)
+0076 set(gca,<span class="string">'XColor'</span>,[0.4 0.4 0.4],<span class="string">'YColor'</span>,[0.4 0.4 0.4],<span class="keyword">...</span>
+0077    <span class="string">'FontSize'</span>,8)
+0078 hold on
+0079 
+0080 <span class="comment">% Kappa-Tau with Ms = 2</span>
+0081 <span class="comment">% in order to obtain better performance</span>
+0082 [K,Ti,Td,N,b] = <a href="pid_tuning.html" class="code" title="function [K,Ti,Td,N,b] = pid_tuning(model,method,param,regStruct,As)">pid_tuning</a>(modelFOPDT,<span class="string">'KT'</span>,2,<span class="string">'PID'</span>);
+0083 PIDPARAMETERS = [K,Ti,Td,N,b];
+0084 sim(<span class="string">'steppidsupport'</span>);
+0085 subplot(211)
+0086 plot(tout,pvVec,<span class="string">'r'</span>)
+0087 subplot(212)
+0088 plot(tout,cvVec,<span class="string">'r'</span>)
+0089 
+0090 <span class="comment">% Internal Model Control with lambda = Tf/5</span>
+0091 <span class="comment">% this means that the closed loop model is made five time faster than the</span>
+0092 <span class="comment">% original (open loop model)</span>
+0093 [K,Ti,Td,N,b] = <a href="pid_tuning.html" class="code" title="function [K,Ti,Td,N,b] = pid_tuning(model,method,param,regStruct,As)">pid_tuning</a>(modelFOPDT,<span class="string">'IMC'</span>,Tf/10,<span class="string">'PID'</span>);
+0094 PIDPARAMETERS = [K,Ti,Td,N,b];
+0095 sim(<span class="string">'steppidsupport'</span>);
+0096 subplot(211)
+0097 plot(tout,pvVec,<span class="string">'g'</span>)
+0098 subplot(212)
+0099 plot(tout,cvVec,<span class="string">'g'</span>)
+0100 
+0101 <span class="comment">% Ziegler &amp; Nichols with Relay identification</span>
+0102 [K,Ti,Td,N,b] = <a href="pid_tuning.html" class="code" title="function [K,Ti,Td,N,b] = pid_tuning(model,method,param,regStruct,As)">pid_tuning</a>(modelPI,<span class="string">'ZN (CL)'</span>,[],<span class="string">'PID'</span>);
+0103 PIDPARAMETERS = [K,Ti,Td,N,b];
+0104 sim(<span class="string">'steppidsupport'</span>);
+0105 subplot(211)
+0106 plot(tout,pvVec,<span class="string">'m'</span>,tout,spVec,<span class="string">'k:'</span>)
+0107 title(<span class="string">'Step and Load Disturbance Response'</span>,<span class="keyword">...</span>
+0108    <span class="string">'Color'</span>,[0 0 0],<span class="string">'FontSize'</span>,8)
+0109 ylabel(<span class="string">'Process Value'</span>,<span class="keyword">...</span>
+0110    <span class="string">'Color'</span>,[0 0 0],<span class="string">'FontSize'</span>,8)
+0111 legend(<span class="string">'STEP + ZN(OL)'</span>,<span class="string">'STEP + KT'</span>,<span class="string">'STEP + IMC'</span>,<span class="string">'RELAY + ZN(CL)'</span>,4)
+0112 subplot(212)
+0113 plot(tout,cvVec,<span class="string">'m'</span>)
+0114 xlabel(<span class="string">'Time [sec]'</span>,<span class="keyword">...</span>
+0115    <span class="string">'Color'</span>,[0 0 0],<span class="string">'FontSize'</span>,8)
+0116 ylabel(<span class="string">'Control Variable'</span>,<span class="keyword">...</span>
+0117    <span class="string">'Color'</span>,[0 0 0],<span class="string">'FontSize'</span>,8)</pre></div>
+<br>
+<p><table bgcolor="#ffe4b0" border=0 width="100%" cellpadding=0 cellspacing=0><tr valign=top><td align=left width=20><a href="pid_tuning.html"><img src="b_prev.gif" alt="Previous page" border=0 align=bottom></a>&nbsp;</td><td align=left>&nbsp;pid_tuning</td><td>&nbsp;</td><td align=right></td><td align=right width=20></td></tr></table>
+<br>
+<address>Generated on Wed 17-Mar-2004 09:29:44 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<html><head><title>The ISA-PID Regulator :: Introduction to PID Autotuning (AutotunerPID Toolkit)</title>
+<!-- $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $ -->
+
+<!-- DOCNAME: AutotunerPID Toolkit -->
+<!-- CHUNKNAME: The ISA-PID Regulator -->
+<!-- CHAPNAME: Introduction to PID Autotuning -->
+<!-- HEADSTUFF -->
+<link href="docstyle1.css" rel="stylesheet" type="text/css">
+</head>
+<body bgcolor=#ffffff>
+<!-- NAVBARTOP -->
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline bgcolor="#ffe4b0"><b>AutotunerPID Toolkit</b></td>
+<td valign=baseline bgcolor="#ffe4b0" align=right><a href="autopid_int.html"><img src="b_prev.gif" alt="Previous page" border=0></a>&nbsp;&nbsp;&nbsp;<a href="autopid_in3.html"><img src="b_next.gif" alt="Next Page" border=0></a></td>
+</tr>
+</table>
+
+
+<a name="process_identification"></a><!-- H1 -->
+<p><font size=+2 color="#990000"><b>The ISA-PID Regulator</b></font><br>
+<p>Several PID structure are available in literature: the regulator used in this
+  application is the so called &quot;ISA PID&quot;, that is widely accepted
+  in the industrial domain. The ISA PID control law is expressed as</p>
+<img src="images/pidFormula.gif">
+<p>where <font face="Courier New, Courier, mono">Y<sup>0</sup>(s)</font>, <font face="Courier New, Courier, mono">Y<sub>m</sub>(s)</font>
+	and <font face="Courier New, Courier, mono">U(s)</font> are, respectively, the Laplace transforms of
+	the <em>set-point</em> (<em>SP</em>), the (measurement of the) controlled variable or <em>process value</em> (<em>PV</em>),
+	and the control signal or <em>control variable</em> (<em>CV</em>), <font face="Courier New, Courier, mono">K</font>
+	is the PID gain, <font face="Courier New, Courier, mono">Ti</font> the integral time, and
+	<font face="Courier New, Courier, mono">Td</font> the derivative time. The ISA PID encompasses the set-point
+	weights
+	<font face="Courier New, Courier, mono">b</font> and <font face="Courier New, Courier, mono">c</font> in
+	the proportional and derivative actions.</p>
+<p>Traditionally, <font face="Courier New, Courier, mono">b</font> is thought to have the role to limit
+ 	the control step that may arise as a consequence of an error step, while <font face="Courier New, Courier, mono">c</font>
+	has to limit the control spike that may arise as a consequence of an error step, also with a proper controller.
+	In the autotuning context, <font face="Courier New, Courier, mono">b</font> and <font face="Courier New, Courier, mono">c</font>
+	can have a more extensive and flexible role, however. The derivative part is made proper by adding a pole with time
+	constant proportional to <font face="Courier New, Courier, mono">Td</font> via parameter
+	<font face="Courier New, Courier, mono">N</font>.</p>
+<br>
+<p><table bgcolor="#ffe4b0" border=0 width="100%" cellpadding=0 cellspacing=0><tr valign=top><td align=left width=20><a href="autopid_int.html"><img src="b_prev.gif" alt="Previous page" border=0 align=bottom></a>&nbsp;</td><td align=left>&nbsp;Introduction to PID Autotuning</td><td>&nbsp;</td><td align=right>Process Identification&nbsp;</td><td align=right width=20><a href="autopid_in3.html"><img src="b_next.gif" alt="Next page" border=0 align=bottom></a></td></tr></table>
+<br>
+
+<!-- Copyright 2004 W.Spinelli -->
+<!-- Last updated: Sat Feb 28 12:00:00 2004 -->
+</body>
+</html>
+
+

@@ -1,0 +1,89 @@
+<html><head><title>Setting up the simulation :: Getting started with AutotunerPID Toolkit (AutotunerPID Toolkit)</title>
+<!-- $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $ -->
+
+<!-- DOCNAME: AutotunerPID Toolkit -->
+<!-- CHUNKNAME: Setting up the simulation -->
+<!-- CHAPNAME: Getting started with AutotunerPID Toolkit -->
+<!-- HEADSTUFF -->
+<link href="docstyle1.css" rel="stylesheet" type="text/css">
+</head>
+<body bgcolor=#ffffff>
+<!-- NAVBARTOP -->
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline bgcolor="#ffe4b0"><b>AutotunerPID Toolkit</b></td>
+<td valign=baseline bgcolor="#ffe4b0" align=right><a href="autopid_sim.html"><img src="b_prev.gif" alt="Previous page" border=0></a>&nbsp;&nbsp;&nbsp;<a href="autopid_si3.html"><img src="b_next.gif" alt="Next Page" border=0></a></td>
+</tr>
+</table>
+
+
+<a name="process_identification"></a><!-- H1 -->
+<p><font size=+2 color="#990000"><b>Setting up the Simulation</b></font><br>
+<p>The parameters of the simulation can be adjusted by the user both through the classical Simulink
+	menu and with a set of block masks.
+</p>
+
+<a name="parameters_area"></a><!-- H2 --><a name="t1"></a>
+<p><font size=+1 color="#990000"><b>Simulation Control</b></font><br>
+<p><font color="#990000"><b>Running the simulation</b></font>
+<p>The simulation is started, stopped and paused with the classical Simulink menu or with toolbar buttons.</p>
+
+<p><font color="#990000"><b>Simulation Parameters</b></font>
+<p>The simulation parameters are setted on the <em>Simulation Parameters</em> dialog box, accessible through the
+	Simulation menu. In particular, the <em>stop time</em> is set to a very high value to reproduce the effects of a simulation
+	running continuously, while the <em>solver</em> is the <font face="Courier New, Courier, mono">ode45</font> to allow a plant
+	with a general structure.</p>
+<br>
+
+<a name="parameters_area"></a><!-- H2 --><a name="t2"></a>
+<p><font size=+1 color="#990000"><b>Initialization of the Autotuner</b></font><br>
+<p>The parameters of the regulator can be initialized through the mask of the block <em>PID with Autotuning</em>.</p>
+<table width="100%" border="0">
+  <tr><td align="center"><img src="images/MaskPID.png"></td></tr>
+</table>
+<p><font color="#990000"><b>Initial PID parameters</b></font>
+<p>The first part of the mask allow to set the initial value of the ISA-PID parameters
+ 	(<font face="Courier New, Courier, mono">K</font>, <font face="Courier New, Courier, mono">Ti</font>,
+	<font face="Courier New, Courier, mono">Td</font>, <font face="Courier New, Courier, mono">N</font>,
+	<font face="Courier New, Courier, mono">b</font>). The weight of the derivative action is fixed
+	(<font face="Courier New, Courier, mono">c=0</font>), so that it does not appear in the mask.</p>
+
+<p><font color="#990000"><b>Antiwindup saturation</b></font>
+<p>The lower and higher limits on the control variable are given as a vector in the corresponding text field.
+	To disable antiwindup set the limit to <font face="Courier New, Courier, mono">[-inf, inf]</font>.</p>
+
+<p><font color="#990000"><b>Sample time</b></font>
+<p>The choice of the sample time is related to the process characteristics. In general, small sample
+  times mean a slow simulations, while large semple times mean fast simulations. However, the discretization
+  of the PID adds a delay to the loop which grows with the sample time, so that the effective behavior
+  of the control systems can be very different from the expected one (computed with respect to a continuos
+  time regulator).</p>
+
+<p><font color="#990000"><b>Identification experiment</b></font>
+<p>The last part of the mask allows to set the characteristics of the identification experiment:
+<ul>
+	<li>the <em>amplitude of the control step</em> for open loop experiment or the <em>amplitude of the relay</em>
+		(positive and negative) for closed loop experiment;</li>
+	<li>the <em>hystheresis level</em> of the relay included to reduce the spurious commutations due to measurement
+		noise in closed loop experiment.</li>
+</ul>
+</p>
+
+<a name="butterfilt"></a><!-- H2 --><a name="t3"></a>
+<p><font size=+1 color="#990000"><b>Butterworth filter</b></font><br>
+<p>The parameters of the lowpass Butterworth analog filter can be initialized through the mask of the block <em>Butterworth Analog Filter</em>.</p>
+<table width="100%" border="0">
+  <tr><td align="center"><img src="images/MaskButter.png"></td></tr>
+</table>
+
+<p>In general, the <em>order</em> of the filter should be small enough to keep low the additional phase
+	lag (typically 2 or 3). Similarly the <em>bandwidth</em> should not be too small, even the effect of
+	measurement noise are best counteracted by a small bandwidth.</p>
+
+<br>
+<p><table bgcolor="#ffe4b0" border=0 width="100%" cellpadding=0 cellspacing=0><tr valign=top><td align=left width=20><a href="autopid_sim.html"><img src="b_prev.gif" alt="Previous page" border=0 align=bottom></a>&nbsp;</td><td align=left>&nbsp;Layout of the Control System</td><td>&nbsp;</td><td align=right>PID Control Panel&nbsp;</td><td align=right width=20><a href="autopid_si3.html"><img src="b_next.gif" alt="Next page" border=0 align=bottom></a></td></tr></table>
+<br>
+
+<!-- Copyright 2004 W.Spinelli -->
+<!-- Last updated: Sat Feb 28 12:00:00 2004 -->
+</body>
+</html>

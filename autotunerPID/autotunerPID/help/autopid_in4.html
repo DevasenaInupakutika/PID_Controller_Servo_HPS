@@ -1,0 +1,273 @@
+<html><head><title>Synthesis Methods :: Introduction to PID Autotuning (AutotunerPID Toolkit)</title>
+<!-- $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $ -->
+
+<!-- DOCNAME: AutotunerPID Toolkit -->
+<!-- CHUNKNAME: Synthesis Methods -->
+<!-- CHAPNAME: Introduction to PID Autotuning -->
+<!-- HEADSTUFF -->
+<link href="docstyle1.css" rel="stylesheet" type="text/css">
+</head>
+<body bgcolor=#ffffff>
+<!-- NAVBARTOP -->
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline bgcolor="#ffe4b0"><b>AutotunerPID Toolkit</b></td>
+<td valign=baseline bgcolor="#ffe4b0" align=right><a href="autopid_in3.html"><img src="b_prev.gif" alt="Previous page" border=0></a>&nbsp;&nbsp;&nbsp;<a href="autopid_sim.html"><img src="b_next.gif" alt="Next Page" border=0></a></td>
+</tr>
+</table>
+
+
+<a name="process_identification"></a><!-- H1 -->
+<p><font size=+2 color="#990000"><b>Synthesis methods</b></font><br>
+<p>Once that a model (or some characteristic) of the plant have been identified,
+  the second step is to tune the parameters of the PID regulator in order to
+  achieve the best performances. In the following a brief overview of the
+  synthesis methods implemented in the Toolkit is given.</p>
+<p><a href="autopid_in4.html#t1">Ziegler &amp; Nichols with Step Identification [ZN(OL)]</a></p>
+<p><a href="autopid_in4.html#t2">Kappa-Tau [KT]</a></p>
+<p><a href="autopid_in4.html#t3">Internal Model Control [IMC]</a></p>
+<p><a href="autopid_in4.html#t4">Ziegler &amp; Nichols with Relay Identification [ZN(CL)]</a></p>
+
+<a name="znol_method"></a><!-- H2 --><a name="t1"></a>
+<p><font size=+1 color="#990000"><b>Ziegler &amp; Nichols with Step Identification [ZN(OL)]</b></font><br>
+<p> The first Ziegler and Nichols method tunes the parameter of the PID according to the following table,
+	on the basis of the parameters identified for a FOPDT model</p>
+<table width="400" border="1" align="center">
+  <tr bgcolor="#CCCCCC">
+    <th width="100" scope="col">&nbsp;</th>
+    <th width="100" scope="col">K</th>
+    <th width="100" scope="col">Ti</th>
+    <th width="100" scope="col">Td</th>
+  </tr>
+  <tr>
+    <th width="100" bgcolor="#CCCCCC" scope="row">P</th>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">T/mL</font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">0</font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">0</font></td>
+  </tr>
+  <tr>
+    <th width="100" bgcolor="#CCCCCC" scope="row">PI</th>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">0.9T/mL</font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">3L</font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">0</font></td>
+  </tr>
+  <tr>
+    <th width="100" bgcolor="#CCCCCC" scope="row">PID</th>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">1.2T/mL</font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">2L</font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">0.5L</font></td>
+  </tr>
+</table>
+
+<p>In the original version of method, the tuning formulas are given with respect
+  to some characteristic of the process identified in terms of the 
+  points where  the tangent to the step response in the point of
+  maximum slope intersect the step response. However here the modified version
+  has been used since it is more robust with respect to noise.</p>
+	
+<br>
+<a name="kt_method"></a><!-- H2 --><a name="t2"></a>
+<p><font size=+1 color="#990000"><b>Kappa-Tau [KT]</b></font><br>
+<p>The Kappa-Tau  method computes the parameters of the 2-d.o.f. ISA PID
+  control law apart from <font face="Courier New, Courier, mono">N</font> and
+  in the output derivation case (i.e. <font face="Courier New, Courier, mono">c=0</font>).
+  It requires to identify a FOPDT model if the process is not integrating, or
+  a FOPDT one plus a factor <font face="Courier New, Courier, mono">1/s</font> if
+  it is (not yet considered in the Toolkit).</p>
+<p>The information used is then given by the model parameters <font face="Courier New, Courier, mono">m</font>,
+  <font face="Courier New, Courier, mono">T</font> and <font face="Courier New, Courier, mono">L</font>,
+	and by the request of a PI or PID regulator. A further specification is the required magnitude margin <font face="Courier New, Courier, mono">M<sub>s</sub></font>,
+ 	defined as</p>
+<img src="images/ktFormula.gif">
+<p>for which the two values of 1.4 (conservative tuning) or 2.0 (more aggressive tuning) are advised.
+   Defining the <em>process normalized gain</em> <font face="Courier New, Courier, mono">alpha</font> and <em>normalized
+   delay</em>
+ 	<font face="Courier New, Courier, mono">tau</font> as</p>
+	<img src="images/ktFormula1.gif">
+<p>the PI(D) regulator parameters are computed as</p>
+<img src="images/ktFormula2.gif">
+<p> The coefficients <font face="Courier New, Courier, mono">A<sub>i</sub></font>,
+	<font face="Courier New, Courier, mono">B<sub>i</sub></font>, <font face="Courier New, Courier, mono">C<sub>i</sub></font>,
+	<font face="Courier New, Courier, mono">D<sub>i</sub></font> come from the following
+	table. These coefficients were derived by applying dominant pole design to many
+	different processes and then interpolating the results to obtain compact tuning
+	relationships. Thus, this is a model following method with the peculiarity
+	of using interpolation. One important remark is that the normalized delay, sometimes
+	called the &quot;controllability index&quot;, can be taken as a measure of
+	how difficult to control a process is.</p>
+<table width="534" border="1" align="center">
+  <tr bgcolor="#CCCCCC">
+    <th width="100" bgcolor="#CCCCCC" scope="row">Structure</th>
+    <th width="100" bgcolor="#FFFFFF" scope="col">PI</th>
+    <th width="100" bgcolor="#FFFFFF" scope="col">PI</th>
+    <th width="100" bgcolor="#FFFFFF" scope="col">PID</th>
+    <th width="100" bgcolor="#FFFFFF" scope="col">PID</th>
+  </tr>
+  <tr>
+    <th width="100" bgcolor="#CCCCCC" scope="row">M<sub>s</sub></th>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">1.4</font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">2.0</font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">1.4</font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">2.0</font></td>
+  </tr>
+  <tr>
+    <th width="100" bgcolor="#CCCCCC" scope="row">A<sub>0</sub></th>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">0.29</font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">0.78</font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">3.8</font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">8.4</font></td>
+  </tr>
+  <tr>
+    <th bgcolor="#CCCCCC" scope="row">A<sub>1</sub></th>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">-2.7</font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">-4.1</font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">-8.4</font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">-9.6</font></td>
+  </tr>
+  <tr>
+    <th bgcolor="#CCCCCC" scope="row">A<sub>2</sub></th>
+    <td align="center"><font face="Courier New, Courier, mono">3.7</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">5.7</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">7.3</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">9.8</font></td>
+  </tr>
+  <tr>
+    <th bgcolor="#CCCCCC" scope="row">B<sub>0</sub></th>
+    <td align="center"><font face="Courier New, Courier, mono">8.9</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">8.9</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">5.2</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">3.2</font></td>
+  </tr>
+  <tr>
+    <th bgcolor="#CCCCCC" scope="row">B<sub>1</sub></th>
+    <td align="center"><font face="Courier New, Courier, mono">-6.6</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">-6.6</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">-2.5</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">-1.5</font></td>
+  </tr>
+  <tr>
+    <th bgcolor="#CCCCCC" scope="row">B<sub>2</sub></th>
+    <td align="center"><font face="Courier New, Courier, mono">3.0</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">3.0</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">-1.4</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">-0.93</font></td>
+  </tr>
+  <tr>
+    <th bgcolor="#CCCCCC" scope="row">C<sub>0</sub></th>
+    <td align="center"><font face="Courier New, Courier, mono">0</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">0</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">0.89</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">0.86</font></td>
+  </tr>
+  <tr>
+    <th bgcolor="#CCCCCC" scope="row">C<sub>1</sub></th>
+    <td align="center"><font face="Courier New, Courier, mono">0</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">0</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">-0.37</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">-1.9</font></td>
+  </tr>
+  <tr>
+    <th bgcolor="#CCCCCC" scope="row">C<sub>2</sub></th>
+    <td align="center"><font face="Courier New, Courier, mono">0</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">0</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">-4.1</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">-0.44</font></td>
+  </tr>
+  <tr>
+    <th bgcolor="#CCCCCC" scope="row">D<sub>0</sub></th>
+    <td align="center"><font face="Courier New, Courier, mono">0.81</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">0.48</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">0.4</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">0.22</font></td>
+  </tr>
+  <tr>
+    <th bgcolor="#CCCCCC" scope="row">D<sub>1</sub></th>
+    <td align="center"><font face="Courier New, Courier, mono">0.73</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">0.78</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">0.18</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">0.65</font></td>
+  </tr>
+  <tr>
+    <th bgcolor="#CCCCCC" scope="row">D<sub>2</sub></th>
+    <td align="center"><font face="Courier New, Courier, mono">1.9</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">-0.45</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">2.8</font></td>
+    <td align="center"><font face="Courier New, Courier, mono">0.051</font></td>
+  </tr>
+</table>
+
+<br>
+<a name="imc_method"></a><!-- H2 --><a name="t3"></a>
+<p><font size=+1 color="#990000"><b>Internal Model Control [IMC]</b></font><br>
+<p>To explain the main idea behind the Internal Model Control consider the block diagram below</p>
+<table width="100%" border="0">
+  <tr><td align="center"><img src="images/imcSchema.png"></td></tr>
+</table>
+<p>where P(s) is the transfer function of the process (which we assume to be
+  asymptotically stable, thus excluding integrating processes), <font face="Courier New, Courier, mono">M(s)</font>
+	is the process model, <font face="Courier New, Courier, mono">Q(s)</font> and
+	<font face="Courier New, Courier, mono">F(s)</font> are asymptotically stable transfer functions, at this
+  stage arbitrary; <font face="Courier New, Courier, mono">Y<sub>m</sub>(s)</font> and
+	<font face="Courier New, Courier, mono">Y<sub>n</sub>(s)</font> are the true (measured) and nominal controlled variables.</p>
+<p>Coming to its practical use, the IMC synthesis method is a two-step procedure.
+  First <font face="Courier New, Courier, mono">Q(s)</font> is determined as an approximated
+	inverse of <font face="Courier New, Courier, mono">M(s)</font>, namely that of its minimum-phase
+	part. Then, to ensure robustness, the low-pass &quot;IMC filter&quot; <font face="Courier New, Courier, mono">F(s)</font>
+	is introduced. The structure and the parameters of F(s) are chosen to achieve a reasonable balance between
+	robust stability and performance.<br></p>
+<p>Being in the ideal case <font face="Courier New, Courier, mono">T(s) = F(s)Q(s)M(s)</font>, the IMC is a model-following
+ 	method trying (roughly speaking) to cancel <font face="Courier New, Courier, mono">M(s)</font> with
+	<font face="Courier New, Courier, mono">Q(s)</font> so as to impose the closed-loop dynamics
+	<font face="Courier New, Courier, mono">F(s)</font>.</p>
+<p>In synthesis, the method consists of identifying a FOPDT model and then applying the IMC technique by choosing</p>
+<img src="images/imcFormula.gif">
+<p>and by replacing the process delay by its <font face="Courier New, Courier, mono">(1,1)</font> Pade approximation
+ 	<font face="Courier New, Courier, mono">(1-sL/2)/(1+sL/2)</font>. The regulator turns out to be a real PID given by</p>
+<p><img src="images/imcFormula1.gif"> </p>
+<p>The main concern in using the IMC-PID method is the choice of <font face="Courier New, Courier, mono">lambda</font>,
+ 	which is a knob for trading stability and robustness against performance.</p>
+
+<br>
+<a name="zncl_method"></a><!-- H2 --><a name="t4"></a>
+<p><font size=+1 color="#990000"><b>Ziegler &amp; Nichols with Relay Identification [ZN(CL)]</b></font><br>
+<p>The second Ziegler and Nichols method tunes the parameter of the PID according
+ 	to the following table, on the basis of a point of the frequency response identified by a relay experiment.
+	The period of oscillation is denoted as <font face="Courier New, Courier, mono">T<sub>u</sub></font>, while the
+	gain margin is <font face="Courier New, Courier, mono">Ku = 4As/pi*A</font>.</p>
+<table width="400" border="1" align="center">
+  <tr bgcolor="#CCCCCC">
+    <th width="100" scope="col">&nbsp;</th>
+    <th width="100" scope="col">K</th>
+    <th width="100" scope="col">Ti</th>
+    <th width="100" scope="col">Td</th>
+  </tr>
+  <tr>
+    <th width="100" bgcolor="#CCCCCC" scope="row">P</th>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">0.5K<sub>u</sub></font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">0</font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">0</font></td>
+  </tr>
+  <tr>
+    <th width="100" bgcolor="#CCCCCC" scope="row">PI</th>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">0.4K<sub>u</sub></font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">0.8T<sub>u</sub></font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">0</font></td>
+  </tr>
+  <tr>
+    <th width="100" bgcolor="#CCCCCC" scope="row">PID</th>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">0.6K<sub>u</sub></font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">0.5T<sub>u</sub></font></td>
+    <td width="100" align="center"><font face="Courier New, Courier, mono">0.125T<sub>u</sub></font></td>
+  </tr>
+</table>
+<p>In the original version of method, the identification of the point requires to apply proportional control
+ 	and increase the controller gain until the process output reaches a sustained oscillation. However it is a dangerous
+	practice since it leads the model near the stability limit.</p>
+<br>
+
+<p><table bgcolor="#ffe4b0" border=0 width="100%" cellpadding=0 cellspacing=0><tr valign=top><td align=left width=20><a href="autopid_in3.html"><img src="b_prev.gif" alt="Previous page" border=0 align=bottom></a>&nbsp;</td><td align=left>&nbsp;Process Identification</td><td>&nbsp;</td><td align=right>Layout of the Control System&nbsp;</td><td align=right width=20><a href="autopid_sim.html"><img src="b_next.gif" alt="Next page" border=0 align=bottom></a></td></tr></table>
+<br>
+
+<!-- Copyright 2004 W.Spinelli -->
+<!-- Last updated: Sat Feb 28 12:00:00 2004 -->
+</body>
+</html>

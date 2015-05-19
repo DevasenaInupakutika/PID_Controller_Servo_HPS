@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of idareas</title>
+  <meta name="keywords" content="idareas">
+  <meta name="description" content="IDAREAS Identification of a FOPDT model using the method of the">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="m2html.css">
+</head>
+<body>
+
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline bgcolor="#ffe4b0"><b>AutotunerPID Toolkit</b></td>
+<td valign=baseline bgcolor="#ffe4b0" align=right><a href="envgui.html"><img src="b_prev.gif" alt="Previous page" border=0></a>&nbsp;&nbsp;&nbsp;<a href="pid_autotuner.html"><img src="b_next.gif" alt="Next Page" border=0></a></td>
+</tr>
+</table>
+
+<h1>idareas</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="box"><strong>Identification of a FOPDT model using the method of the areas.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="box"><strong>function model = idareas(y,As,Ts) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="fragment"><pre class="comment">IDAREAS Identification of a FOPDT model using the method of the
+   areas.
+
+   MODEL = IDAREAS(Y,As,Ts) returns a structure describing the identified
+   FOPDT (First Order Plus Dead Time) model in the form
+            M(s) = m*exp(-s*L) / (1+s*T)
+   The structure has the following fields MODEL.m, MODEL.L and MODEL.T
+   with obvious meaning.
+   The function requires the recorded step response Y, the amplitude of
+   the step used for identification As and the sample time Ts.
+
+   Author:    William Spinelli (wspinell@elet.polimi.it)
+   Copyright  2004 W.Spinelli
+   $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(matlabicon.gif)">
+<li><a href="bodePIDcompare.html" class="code" title="function bodePIDcompare(num,den,tau)">bodePIDcompare</a>	BODEPIDCOMPARE  Comparison of Bode Diagrams with different autotuning</li><li><a href="pid_autotuner.html" class="code" title="function [sys,x0,str,ts] = pid_autotuner(t,x,u,flag,Ts,As)">pid_autotuner</a>	PID_SUPERV Supervisor of a PID autotuner (implmented as an S-function)</li><li><a href="stepPIDcompare.html" class="code" title="function stepPIDcompare(num,den,tau)">stepPIDcompare</a>	STEPPIDCOMPARE  Comparison of step response on setpoint and load</li></ul>
+<!-- crossreference -->
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function model = idareas(y,As,Ts)</a>
+0002 <span class="comment">%IDAREAS Identification of a FOPDT model using the method of the</span>
+0003 <span class="comment">%   areas.</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%   MODEL = IDAREAS(Y,As,Ts) returns a structure describing the identified</span>
+0006 <span class="comment">%   FOPDT (First Order Plus Dead Time) model in the form</span>
+0007 <span class="comment">%            M(s) = m*exp(-s*L) / (1+s*T)</span>
+0008 <span class="comment">%   The structure has the following fields MODEL.m, MODEL.L and MODEL.T</span>
+0009 <span class="comment">%   with obvious meaning.</span>
+0010 <span class="comment">%   The function requires the recorded step response Y, the amplitude of</span>
+0011 <span class="comment">%   the step used for identification As and the sample time Ts.</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%   Author:    William Spinelli (wspinell@elet.polimi.it)</span>
+0014 <span class="comment">%   Copyright  2004 W.Spinelli</span>
+0015 <span class="comment">%   $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $</span>
+0016 
+0017 <span class="comment">% compute auxiliary parameters</span>
+0018 m = (y(end)-y(1))/As;                     <span class="comment">% process gain</span>
+0019 
+0020 <span class="comment">% if m&lt;0 reverse the step response</span>
+0021 <span class="keyword">if</span> m&lt;0
+0022    y = -y;
+0023 <span class="keyword">end</span>
+0024 
+0025 <span class="comment">% change this setting one can try to robustify the identification process</span>
+0026 <span class="comment">% with noisy step response</span>
+0027 y1 = y(1);
+0028 yN = y(end);
+0029 
+0030 <span class="comment">% reverse undershoot and overshoot</span>
+0031 y(y&lt;y1) = y1;
+0032 y(y&gt;yN) = y(y&gt;yN) - 2*(y(y&gt;yN)-yN);
+0033 
+0034 A0  = sum(yN-y)*Ts;              <span class="comment">% upper area</span>
+0035 it0 = fix(A0/abs(m)/Ts);         <span class="comment">% compute the index of the vector</span>
+0036                                  <span class="comment">% (not the value of t0)</span>
+0037 A1  = sum(y(1:it0)-y1)*Ts;       <span class="comment">% lower area</span>
+0038 
+0039 <span class="comment">% compute model parameters</span>
+0040 T = exp(1)*A1/abs(m);
+0041 L = max((A0-exp(1)*A1)/abs(m),0);
+0042 
+0043 model.L = L;
+0044 model.T = T;
+0045 model.m = m;</pre></div>
+<br>
+<p><table bgcolor="#ffe4b0" border=0 width="100%" cellpadding=0 cellspacing=0><tr valign=top><td align=left width=20><a href="envgui.html"><img src="b_prev.gif" alt="Previous page" border=0 align=bottom></a>&nbsp;</td><td align=left>&nbsp;envgui</td><td>&nbsp;</td><td align=right>pid_autotuner&nbsp;</td><td align=right width=20><a href="pid_autotuner.html"><img src="b_next.gif" alt="Next page" border=0 align=bottom></a></td></tr></table>
+<br>
+<address>Generated on Wed 17-Mar-2004 09:29:44 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

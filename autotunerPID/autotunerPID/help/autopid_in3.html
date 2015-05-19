@@ -1,0 +1,98 @@
+<html><head><title>Process Identification :: Introduction to PID Autotuning (AutotunerPID Toolkit)</title>
+<!-- $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $ -->
+
+<!-- DOCNAME: AutotunerPID Toolkit -->
+<!-- CHUNKNAME: Process Identification -->
+<!-- CHAPNAME: Introduction to PID Autotuning -->
+<!-- HEADSTUFF -->
+<link href="docstyle1.css" rel="stylesheet" type="text/css">
+</head>
+<body bgcolor=#ffffff>
+<!-- NAVBARTOP -->
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline bgcolor="#ffe4b0"><b>AutotunerPID Toolkit</b></td>
+<td valign=baseline bgcolor="#ffe4b0" align=right><a href="autopid_in2.html"><img src="b_prev.gif" alt="Previous page" border=0></a>&nbsp;&nbsp;&nbsp;<a href="autopid_in4.html"><img src="b_next.gif" alt="Next Page" border=0></a></td>
+</tr>
+</table>
+
+
+<a name="process_identification"></a><!-- H1 -->
+<p><font size=+2 color="#990000"><b>Process Identification</b></font><br>
+<p>The first step in the autotuning process is the identification of a suitable description of the 
+  plant. In the following, the two most common methods used to retrieve a process description are introduced.
+	The first one, called <em>Areas Method</em>, provides a model based process description and it is based on
+	an open-loop step experiment. The second one, called <em>Relay Method</em>, provides a characteristic
+	based model description and it is based on a closed-loop relay experiment.</p>
+<p><a href="autopid_in3.html#t1">Areas Method</a></p>
+<p><a href="autopid_in3.html#t2">Relay Method</a></p>
+
+<a name="areas_method"></a><!-- H2 --><a name="t1"></a>
+<p><font size=+1 color="#990000"><b>Areas Method</b></font><br>
+<p>The areas method belong to the so called <em>model based process description</em> since
+  it identifies a model of the plant through a simple experiment performed on
+  the plant. In the great majority of process loops, the process model seen by
+  the regulator can be described by an asymptotically stable, strictly proper
+  transfer function, which can be reasonably modeled
+  with a <em>First
+  Order Plus Dead Time </em>(<em>FOPDT</em>) <em>model</em></p>
+	<img src="images/fopdtModel.gif">
+<p>Given the step response record <font face="Courier New, Courier, mono">y<sub>s</sub>(t)</font>,
+ 	one must first compute the <em>gain</em> <font face="Courier New, Courier, mono">mu</font> by dividing the response total
+	 swing by the input step amplitude <font face="Courier New, Courier, mono">A<sub>s</sub></font>, and the <em>unit step response</em>
+	 <font face="Courier New, Courier, mono">y<sub>us</sub>(t)=y<sub>s</sub>(t)/A<sub>s</sub></font>.</p>
+<p>Then, denoting by <font face="Courier New, Courier, mono">t<sub>end</sub></font> the final experiment time, i.e. assuming that from
+ 	<font face="Courier New, Courier, mono">t<sub>end</sub></font> on <font face="Courier New, Courier, mono">y<sub>us</sub>(t)&nbsp;=&nbsp;mu</font>,
+	it is necessary to compute in sequence the three quantities</p>
+	<img src="images/areasFormula.gif">
+<p>where the areas <font face="Courier New, Courier, mono">A<sub>0</sub></font> and <font face="Courier New, Courier, mono">A<sub>1</sub></font>,
+ 	which motivate the method's name, are depicted below.</p>
+	<table width="100%" border="0">
+  <tr><td align="center"><img src="images/stepFig.png"></td></tr>
+</table>
+<p>Finally, the other two parameters of the model are obtained as</p>
+<img src="images/areasFormula1.gif">
+<p>and setting <font face="Courier New, Courier, mono">L=0</font> if the computed value be negative (which can happen
+ 	if the real delay is small).</p>
+<p>The method of areas is very powerful, remarkably noise-insensitive (since it uses integration) and quite accurate.
+ 	Moreover, it has the ability of estimating the delay without obliging the user to define thresholds for deciding when
+  the process response has started moving.</p>
+<p>However, there are cases where a control step causes the controlled variable
+  to asymptotically assume a ramp-like behavior: this case is commonly referred
+  to as &quot;runaway&quot;, &quot;integrating&quot; or &quot;non self-regulating&quot;
+  processes and can be described by models with a pole in the origin of the s-plane.
+  This case is not considered in the present version of the application.</p> 
+
+<br>
+<a name="relay_method"></a><!-- H2 --><a name="t2"></a>
+<p><font size=+1 color="#990000"><b>Relay Method</b></font><br>
+<p>The relay identification method belong to the so called <em>characteristic based process description</em> since it
+	identifies a set of distinctive feature of the model rather than a (simple) model of it.</p>
+<p>The main idea in the relay identification is that almost any stable process subject to relay feedback enters a limit
+  cycle, from which some characteristics in the time or (especially) in the	frequency domain are straightforward to obtain.</p>
+<table width="100%" border="0">
+  <tr><td align="center"><img src="images/relaySchema.png"></td></tr>
+</table>	
+<p>If a process with Nyquist curve <font face="Courier New, Courier, mono">P(jw)</font> is subject to relay feedback
+	  with <em>amplitude</em> <font face="Courier New, Courier, mono">D</font> (i.e. whose output is <font face="Courier New, Courier, mono">&plusmn;D</font>)
+	  and <em>hysteresis</em> <font face="Courier New, Courier, mono">E</font> (i.e. whose switching points are at <font face="Courier New, Courier, mono">&plusmn;E</font>),
+	  a permanent oscillation of the process output occurs.</p>
+<p>This oscillation has the frequency <font face="Courier New, Courier, mono">w<sub>ox</sub></font> where <font face="Courier New, Courier, mono">P(jw)</font>
+	intersects the critical point locus of the relay, which is a straight line parallel to the real negative axis,
+	located in the third quadrant of the complex plane and depending on the hysteresis entity.</p>
+<table width="100%" border="0">
+  <tr><td align="center"><img src="images/relayFig.png"></td></tr>
+</table>
+<p>This allows to identify one point of the process Nyquist curve <font face="Courier New, Courier, mono">P(jw)</font>
+	(the point indicated above with the circle). Its magnitude is related to the <em>amplitude</em> <font face="Courier New, Courier, mono">A</font>
+	of the controlled variable oscillation by <font face="Courier New, Courier, mono">|G(jw<sub>ox</sub>)|&nbsp;=&nbsp;pA/4D</font>
+	and its phase can be easily deduced knowing that its real part is <font face="Courier New, Courier, mono">-pE/4D</font>. Moreover the period of the oscillation can be simply computed. </p>
+<br>
+
+
+<p><table bgcolor="#ffe4b0" border=0 width="100%" cellpadding=0 cellspacing=0><tr valign=top><td align=left width=20><a href="autopid_in2.html"><img src="b_prev.gif" alt="Previous page" border=0 align=bottom></a>&nbsp;</td><td align=left>&nbsp;The ISA PID Regulator</td><td>&nbsp;</td><td align=right>Synthesis Methods&nbsp;</td><td align=right width=20><a href="autopid_in4.html"><img src="b_next.gif" alt="Next page" border=0 align=bottom></a></td></tr></table>
+<br>
+
+<!-- Copyright 2004 W.Spinelli -->
+<!-- Last updated: Sat Feb 28 12:00:00 2004 -->
+</body>
+</html>

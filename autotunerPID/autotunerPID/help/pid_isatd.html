@@ -1,0 +1,233 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of pid_isatd</title>
+  <meta name="keywords" content="pid_isatd">
+  <meta name="description" content="PID_ISATD Discrete time ISA-PID (implemented as an S-function)">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html &copy; 2003 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="m2html.css">
+</head>
+<body>
+
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline bgcolor="#ffe4b0"><b>AutotunerPID Toolkit</b></td>
+<td valign=baseline bgcolor="#ffe4b0" align=right><a href="pid_autotuner.html"><img src="b_prev.gif" alt="Previous page" border=0></a>&nbsp;&nbsp;&nbsp;<a href="pid_structure.html"><img src="b_next.gif" alt="Next Page" border=0></a></td>
+</tr>
+</table>
+
+<h1>pid_isatd</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="box"><strong>Discrete time ISA-PID (implemented as a Matlab S-function).</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="box"><strong>function [sys,x0,str,ts] = pid_isatd(t,x,u,flag,Ts,umin,umax,As,hystLevel) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="fragment"><pre class="comment">PID_ISATD Discrete time ISA-PID (implemented as an S-function)
+
+   The PID closely resemble the structure of a real industrial PID and has
+   the following features: 
+     - filter on the derivative action
+     - set-point weight (but not the weight of the derivative action which
+       is fixed to 0)
+     - antiwindup on lower and higher saturation limits of the actuator
+     - bumpless auto-manual switch
+
+   It also implements the logic to perform the identification experiment:
+     - step response identification (with user-defined step amplitude)
+     - relay identification (with user-defined relay amplitude and
+       hysteresis level)
+
+   Author:    William Spinelli (wspinell@elet.polimi.it)
+   Copyright  2004 W.Spinelli
+   $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<ul style="list-style-image:url(matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [sys,x0,str,ts,stato] = mdlInitializeSizes(Ts)</a></li><li><a href="#_sub2" class="code">function [sys,stato] = mdlOutputs(t,x,u,stato,Ts,umin,umax,As,hystLevel)</a></li></ul>
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [sys,x0,str,ts] = pid_isatd(t,x,u,flag,Ts,umin,umax,As,hystLevel)</a>
+0002 <span class="comment">%PID_ISATD Discrete time ISA-PID (implemented as an S-function)</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%   The PID closely resemble the structure of a real industrial PID and has</span>
+0005 <span class="comment">%   the following features:</span>
+0006 <span class="comment">%     - filter on the derivative action</span>
+0007 <span class="comment">%     - set-point weight (but not the weight of the derivative action which</span>
+0008 <span class="comment">%       is fixed to 0)</span>
+0009 <span class="comment">%     - antiwindup on lower and higher saturation limits of the actuator</span>
+0010 <span class="comment">%     - bumpless auto-manual switch</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%   It also implements the logic to perform the identification experiment:</span>
+0013 <span class="comment">%     - step response identification (with user-defined step amplitude)</span>
+0014 <span class="comment">%     - relay identification (with user-defined relay amplitude and</span>
+0015 <span class="comment">%       hysteresis level)</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%   Author:    William Spinelli (wspinell@elet.polimi.it)</span>
+0018 <span class="comment">%   Copyright  2004 W.Spinelli</span>
+0019 <span class="comment">%   $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $</span>
+0020 
+0021 <span class="keyword">persistent</span> stato;           <span class="comment">% internal state variable</span>
+0022 
+0023 CVBlock = <span class="string">'ManValue'</span>;
+0024 <span class="keyword">switch</span> flag,
+0025     <span class="keyword">case</span> 0,
+0026         [sys,x0,str,ts,stato] = <a href="#_sub1" class="code" title="subfunction [sys,x0,str,ts,stato] = mdlInitializeSizes(Ts)">mdlInitializeSizes</a>(Ts);
+0027     <span class="keyword">case</span> 3,
+0028         [sys,stato] = <a href="#_sub2" class="code" title="subfunction [sys,stato] = mdlOutputs(t,x,u,stato,Ts,umin,umax,As,hystLevel)">mdlOutputs</a>(t,x,u,stato,Ts,umin,umax,As,hystLevel);
+0029     <span class="keyword">case</span> { 1, 2, 4, 9 }
+0030         sys=[];
+0031     <span class="keyword">otherwise</span>
+0032         error([<span class="string">'Unhandled flag = '</span>, num2str(flag)]);
+0033 <span class="keyword">end</span>
+0034 <span class="comment">% end pid_isatd</span>
+0035 
+0036 
+0037 <span class="comment">%=============================================================================</span>
+0038 <span class="comment">% mdlInitializeSizes</span>
+0039 <span class="comment">% Return the sizes, initial conditions, and sample times for the S-function.</span>
+0040 <span class="comment">%=============================================================================</span>
+0041 <a name="_sub1" href="#_subfunctions" class="code">function [sys,x0,str,ts,stato] = mdlInitializeSizes(Ts)</a>
+0042 <span class="comment">% set up S-function</span>
+0043 sizes = simsizes;
+0044 
+0045 sizes.NumContStates  = 0;
+0046 sizes.NumDiscStates  = 0;
+0047 sizes.NumOutputs     = 1;
+0048 sizes.NumInputs      = 4;
+0049 sizes.DirFeedthrough = 1;
+0050 sizes.NumSampleTimes = 1;   <span class="comment">% at least one sample time is needed</span>
+0051 
+0052 sys = simsizes(sizes);
+0053 
+0054 x0  = [];
+0055 str = [];
+0056 ts  = [Ts 0];
+0057 stato = [0 0 0 0 0];
+0058 <span class="comment">% end mdlInitializeSizes</span>
+0059 
+0060 <span class="comment">%=============================================================================</span>
+0061 <span class="comment">% mdlOutputs</span>
+0062 <span class="comment">% Return the block outputs.</span>
+0063 <span class="comment">%=============================================================================</span>
+0064 <a name="_sub2" href="#_subfunctions" class="code">function [sys,stato] = mdlOutputs(t,x,u,stato,Ts,umin,umax,As,hystLevel)</a>
+0065 <span class="keyword">global</span> CVVALUE                  <span class="comment">% control variable (used for M/A commutation)</span>
+0066 <span class="keyword">global</span> IDENTIFICATION_METHOD
+0067 <span class="keyword">global</span> TUNING_METHOD
+0068 <span class="keyword">global</span> PIDPARAMETERS
+0069 
+0070 <span class="comment">% measured signals</span>
+0071 sp = u(1);                      <span class="comment">% setpoint value</span>
+0072 pv = u(2);                      <span class="comment">% process value</span>
+0073 
+0074 <span class="comment">% control signals</span>
+0075 auto     = u(3);                <span class="comment">% auto/man switch (MANUAL=0; AUTO=1)</span>
+0076 autotune = u(4);                <span class="comment">% true when autotuning</span>
+0077 
+0078 <span class="comment">% PID parameters (c=0)</span>
+0079 K  = PIDPARAMETERS(1);
+0080 Ti = PIDPARAMETERS(2);
+0081 Td = PIDPARAMETERS(3);
+0082 N  = PIDPARAMETERS(4);
+0083 b  = PIDPARAMETERS(5);
+0084 
+0085 <span class="comment">% translation of the vector stato (for simplicity)</span>
+0086 <span class="comment">% state variable</span>
+0087 ui    = stato(1);               <span class="comment">% integral action</span>
+0088 ud    = stato(2);               <span class="comment">% derivative action (filter)</span>
+0089 
+0090 <span class="comment">% auxiliary variable</span>
+0091 pvold = stato(3);               <span class="comment">% old process value</span>
+0092 cvold = stato(4);               <span class="comment">% old control variable</span>
+0093 atold = stato(5);               <span class="comment">% old autotune state (to ensure bumpless switch)</span>
+0094 
+0095 <span class="comment">% PID algorithm</span>
+0096 <span class="comment">% compute the constants (made each time since PID parameters may change)</span>
+0097 <span class="keyword">if</span> Ti
+0098     a1 = K*Ts/Ti;
+0099 <span class="keyword">else</span>
+0100     <span class="comment">% when Ti = 0 turn off the integral action</span>
+0101     a1 = 0;
+0102 <span class="keyword">end</span>
+0103 b1 = Td/(Td + N*Ts);
+0104 b2 = K*Td*N/(Td + N*Ts);
+0105 
+0106 <span class="comment">% compute control actions</span>
+0107 up = K*(b*sp - pv);
+0108 
+0109 ud = b1*ud - b2*(pv-pvold);
+0110 
+0111 <span class="keyword">if</span> ~autotune &amp; atold
+0112     <span class="comment">% ensure bumpless switch after a change in the regulator parameters</span>
+0113     ui = cvold - up - ud;
+0114 <span class="keyword">end</span>
+0115 
+0116 <span class="keyword">if</span> autotune
+0117     <span class="keyword">if</span> strcmp(IDENTIFICATION_METHOD,<span class="string">'STEP'</span>)
+0118         <span class="comment">% increment the value of the control variable</span>
+0119         cv = CVVALUE+As;
+0120     <span class="keyword">elseif</span> strcmp(IDENTIFICATION_METHOD,<span class="string">'RELAY'</span>)
+0121         <span class="keyword">if</span> ~atold
+0122             cv = CVVALUE+As;
+0123         <span class="keyword">else</span>
+0124             <span class="keyword">if</span> pv &gt;= sp+hystLevel
+0125                 cv = CVVALUE-As;
+0126             <span class="keyword">elseif</span> pv &lt;= sp-hystLevel
+0127                 cv = CVVALUE+As;
+0128             <span class="keyword">else</span>
+0129                 cv = cvold;
+0130             <span class="keyword">end</span>
+0131         <span class="keyword">end</span>
+0132     <span class="keyword">end</span>
+0133 <span class="keyword">else</span>
+0134     <span class="keyword">if</span> ~auto
+0135         <span class="comment">% manual mode</span>
+0136         cv = CVVALUE;
+0137     <span class="keyword">else</span>
+0138         <span class="comment">% automatic regulation</span>
+0139         cv = up + ui + ud;
+0140     <span class="keyword">end</span>
+0141     
+0142     <span class="keyword">if</span> cv &gt; umax
+0143         <span class="comment">% saturation on maximum value (note that the state of the integrator is</span>
+0144         <span class="comment">% not updated)</span>
+0145         cv = umax;
+0146     <span class="keyword">elseif</span> cv &lt; umin
+0147         <span class="comment">% saturation on minimum value</span>
+0148         cv = umin;
+0149     <span class="keyword">else</span>
+0150         <span class="comment">% update the state of the integrator</span>
+0151         <span class="keyword">if</span> auto
+0152             ui = ui + a1*(sp-pv);
+0153         <span class="keyword">else</span>
+0154             ui = cv - up - ud;
+0155         <span class="keyword">end</span>
+0156     <span class="keyword">end</span>
+0157     <span class="comment">% update control variable value</span>
+0158     CVVALUE = cv;
+0159 <span class="keyword">end</span>
+0160 
+0161 <span class="comment">% update internal state vector</span>
+0162 stato = [ui ud pv cv autotune];
+0163 <span class="comment">% generate control variable</span>
+0164 sys = cv;
+0165 <span class="comment">% end mdlOutputs</span></pre></div>
+<br>
+<p><table bgcolor="#ffe4b0" border=0 width="100%" cellpadding=0 cellspacing=0><tr valign=top><td align=left width=20><a href="pid_autotuner.html"><img src="b_prev.gif" alt="Previous page" border=0 align=bottom></a>&nbsp;</td><td align=left>&nbsp;pid_autotuner</td><td>&nbsp;</td><td align=right>pid_structure&nbsp;</td><td align=right width=20><a href="pid_structure.html"><img src="b_next.gif" alt="Next page" border=0 align=bottom></a></td></tr></table>
+<br>
+<address>Generated on Wed 17-Mar-2004 09:29:44 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/">m2html</a></strong> &copy; 2003</address>
+</body>
+</html>

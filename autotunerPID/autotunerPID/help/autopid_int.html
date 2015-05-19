@@ -1,0 +1,90 @@
+<html><head><title>Introduction to PID Autotuning (AutotunerPID Toolkit)</title>
+<!-- $Revision: 1.0 $  $Date: 2004/02/27 12:00:00 $ -->
+
+<!-- DOCNAME: AutotunerPID Toolkit -->
+<!-- CHUNKNAME: Introduction to PID Autotuning -->
+<!-- CHAPNAME: Introduction to PID Autotuning -->
+<!-- HEADSTUFF -->
+<link rel=stylesheet href="docstyle1.css" type="text/css">
+</head>
+<body bgcolor=#ffffff>
+<!-- NAVBARTOP -->
+<table border=0 width="100%" cellpadding=0 cellspacing=0><tr>
+<td valign=baseline bgcolor="#ffe4b0"><b>AutotunerPID Toolkit</b></td>
+<td valign=baseline bgcolor="#ffe4b0" align=right><a href="autopid_pr3.html"><img src="b_prev.gif" alt="Previous page" border=0></a>&nbsp;&nbsp;&nbsp;<a href="autopid_in2.html"><img src="b_next.gif" alt="Next Page" border=0></a></td>
+</tr>
+</table>
+
+
+<a name="introducing_the_aerospace_blockset"></a>
+<h1>Introduction to PID Autotuning</h1>
+<hr>
+<table width="100%" border="0" cellpadding="5">
+<tr>
+  <td valign="top"><a href="autopid_int.html#t1">What is an Autotuner</a><br></td>
+  <td valign="top">Introduction to the PID Autotuning<br></td>
+<tr>
+  <td valign="top"><a href="autopid_in2.html">The ISA-PID Regulator</a><br></td>
+  <td valign="top" width=600>The structure of the ISA-PID regulator<br></td>
+<tr>
+	<td valign="top" width=300><a href="autopid_in3.html">Process Identification</a><br></td>
+	<td valign="top" width=600>How to obtain a &quot;description&quot; of the plant
+  represented by a simple model or by a set of characteristics<br></td>
+<tr>
+  <td valign="top" width=300><a href="autopid_in4.html">Synthesis Method</a><br></td>
+	<td valign="top" width=600>How to compute the parameters of the PID regulator
+  from the available description of the plant<br></td>
+</table>
+
+<ul><table border=1 cellspacing=0 cellpadding=5  width="90%"><tr>
+  <td bgcolor="#ffe4b0"><b>Note  </b>&nbsp;&nbsp;
+	This introduction to autotuning has been extracted from the IFAC Professional Brief
+	<em>Hands-on PID Autotuning: a Guide to Better Utilisation </em> (A. Leva, C. Cox, A. Ruano), 2002.</td>
+</tr></table></ul>
+
+<br>
+<a name="welcome_to_the_autotunerPID_toolbox"></a><!-- H1 -->
+<a name="t1"></a>
+<p><font size=+2 color="#990000"><b>What is an Autotuner</b></font><br>
+<p>An autotuner is something capable of computing the parameters of a regulator connected to a plant
+ 	(i.e. <em>tuning</em> that regulator) automatically and, possibly, without any user interaction apart
+	from initiating the operation.</p>
+<p>The best way to understand autotuners is to analyze how a PID regulator may be manually tuned by a
+  human. The basic steps of a tuning process may be summarized as follows</p>
+<ul>
+	<li><strong>observing the process behavior</strong>, eventually stimulating it somehow and turning this
+		knowledge into a <em>description</em> of the process behavior</li>
+	<li><strong>establishing the desired closed loop behavior</strong> on the basis of the obtained process
+	   description;</li>
+	<li><strong>computing the regulator parameters</strong> in order to achieve the desired closed loop behavior.</li>
+</ul>
+<p>Formalizing these steps establishes a <em>tuning method</em>. An <em>autotuner</em> is then an implementation
+  of a tuning method capable of running <em>automatically</em>.</p>
+
+<p>The &quot;description&quot; of the process may be obtained in two ways:
+<ul>
+	<li>the first approach identifies a model of the process from the data, where <em>model</em> means
+		something that can be simulated and that captures the process dynamics precisely enough to allow
+	  forecasting once the regulator is tuned (<em>model based autotuner</em>);</li>
+	<li>the other approach is to employ the process data immediately for the subsequent tuning (<em>non model based
+	autotuner</em>). The relevant fact is that these representations cannot be simulated. Non model based autotuners are also identified as
+	<em>characteristics based</em> autotuners.
+</ul>
+</p>
+<p>Tuning rules can be constructed in several ways:
+<ul>
+	<li>choosing the regulator parameters so that the expected closed loop behavior (forecasted using the
+	  process model) is as similar as possible to that of a reference model (<em>model based, model
+		following autotuner</em>);</li>
+	<li>computing the regulator parameters so that some time or frequency domain properties are satisfied
+		by the closed loop system (<em>model based, characteristics following autotuner</em>).</li>
+</ul>
+<br>
+
+<p><table bgcolor="#ffe4b0" border=0 width="100%" cellpadding=0 cellspacing=0><tr valign=top><td align=left width=20><a href="autopid_pr3.html"><img src="b_prev.gif" alt="Previous page" border=0 align=bottom></a>&nbsp;</td><td align=left>&nbsp;Reference</td><td>&nbsp;</td><td align=right>The ISA-PID Regulator&nbsp;</td><td align=right width=20><a href="autopid_in2.html"><img src="b_next.gif" alt="Next page" border=0 align=bottom></a></td></tr></table>
+<br>
+
+<!-- Copyright 2004 W.Spinelli -->
+<!-- Last updated: Sat Feb 28 12:00:00 2004 -->
+</body>
+</html>
